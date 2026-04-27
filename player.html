@@ -10,7 +10,7 @@ content="width=device-width,initial-scale=1,maximum-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 
 <link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.6.0/controls.min.css">
+href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.6.0/controls.min.css"/>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.6.0/shaka-player.ui.min.js"></script>
 
@@ -49,7 +49,7 @@ padding:0 16px;
 background:rgba(10,10,10,.96);
 backdrop-filter:blur(12px);
 border-bottom:1px solid var(--border);
-z-index:9999;
+z-index:99999;
 }
 
 .logo{
@@ -88,12 +88,14 @@ padding-top:56px;
 .player-wrap{
 max-width:900px;
 margin:auto;
+background:#000;
 }
 
 .player-box{
 position:relative;
 padding-top:56.25%;
 background:#000;
+overflow:hidden;
 }
 
 .shaka-video-container{
@@ -109,7 +111,7 @@ object-fit:contain;
 background:#000;
 }
 
-/* SHAKA */
+/* SHAKA UI FIX */
 
 .shaka-controls-container,
 .shaka-bottom-controls{
@@ -121,7 +123,7 @@ background:#f07020!important;
 }
 
 .shaka-buffered-range{
-background:rgba(255,255,255,.45)!important;
+background:rgba(255,255,255,.4)!important;
 }
 
 .shaka-seek-bar{
@@ -141,12 +143,12 @@ width:70px!important;
 opacity:1!important;
 }
 
-/* LIVE badge */
+/* LIVE BAR */
 
 #liveBadgeBar{
 position:absolute;
 right:18px;
-bottom:64px;
+bottom:70px;
 display:flex;
 gap:10px;
 align-items:center;
@@ -154,7 +156,7 @@ padding:8px 14px;
 background:rgba(0,0,0,.75);
 border:1px solid rgba(240,112,32,.35);
 border-radius:30px;
-z-index:9300;
+z-index:9400;
 font-size:12px;
 font-weight:700;
 }
@@ -200,12 +202,13 @@ flex-direction:column;
 justify-content:center;
 align-items:center;
 gap:18px;
-z-index:100;
+z-index:200;
 background:linear-gradient(
 to bottom,
-rgba(0,0,0,.2),
+rgba(0,0,0,.15),
 rgba(0,0,0,.65)
 );
+transition:.3s;
 }
 
 #overlay.hide{
@@ -246,7 +249,7 @@ fill:#fff;
 margin-left:4px;
 }
 
-/* watermark */
+/* WATERMARK */
 
 #watermark{
 position:absolute;
@@ -304,7 +307,7 @@ font-family:'Bebas Neue';
 font-size:22px;
 }
 
-/* related */
+/* GRID */
 
 .related{
 max-width:900px;
@@ -340,8 +343,8 @@ border-color:#f07020;
 .card-logo{
 height:70px;
 display:flex;
-align-items:center;
 justify-content:center;
+align-items:center;
 padding:8px;
 background:#1a1a1a;
 }
@@ -371,31 +374,24 @@ opacity:.6;
 <body>
 
 <header>
-<div class="logo">
-<span>NY</span> CRICKET
-</div>
-
-<div class="live-pill">
-● LIVE
-</div>
-
-<a href="index.html" class="back">
-All Channels
-</a>
+<div class="logo"><span>NY</span> CRICKET</div>
+<div class="live-pill">● LIVE</div>
+<a href="index.html" class="back">All Channels</a>
 </header>
 
 <main>
 
 <div class="player-wrap">
-
 <div class="player-box">
 
 <div class="shaka-video-container">
 
-<video playsinline></video>
+<video id="video"
+autoplay
+muted
+playsinline></video>
 
 <div id="overlay">
-
 <div id="spinner"></div>
 
 <div id="playButton">
@@ -410,25 +406,21 @@ Loading Stream...
 
 </div>
 
-<img id="watermark"
+<img
+id="watermark"
 src="https://i.postimg.cc/J4m9Dz70/Gemini-Generated-Image-4zvnud4zvnud4zvn-Picsart-Background-Remover.png">
 
 <div id="liveBadgeBar">
 <div id="liveDot"></div>
 <div>LIVE</div>
-<button id="goLiveBtn">
-Go Live
-</button>
+<button id="goLiveBtn">Go Live</button>
 </div>
 
 <div id="errorBox">
 <div id="errorText">
 Stream Error
 </div>
-
-<button onclick="retryLoad()">
-Retry
-</button>
+<button onclick="retryLoad()">Retry</button>
 </div>
 
 </div>
@@ -438,9 +430,7 @@ Retry
 <div class="info">
 <img id="logo">
 <div>
-<div
-class="channel-name"
-id="channelName">
+<div class="channel-name" id="channelName">
 Loading...
 </div>
 <div>LIVE HD STREAM</div>
@@ -448,16 +438,10 @@ Loading...
 </div>
 
 <div class="related">
-
 <div class="title">
 MORE CHANNELS
 </div>
-
-<div
-class="grid"
-id="grid">
-</div>
-
+<div id="grid" class="grid"></div>
 </div>
 
 </main>
@@ -466,205 +450,109 @@ id="grid">
 © 2025 NY Cricket Live
 </footer>
 
+
 <script>
 
-const API='https://binge-jiotv.pages.dev/data/id.json';
+const API="https://binge-jiotv.pages.dev/data/id.json";
 
-
-async function fetchChannels(){
-
-try{
-
-const res=await fetch(
-API,
-{
-cache:"no-store"
-}
-);
-
-const data=await res.json();
-
-/* supports your exact format */
-if(
-data &&
-Array.isArray(data.channels)
-){
-return data.channels;
-}
-
-/* fallback if array */
-if(Array.isArray(data)){
-return data;
-}
-
-throw "Bad JSON";
-
-}
-catch(e){
-
-console.error(
-"Channel JSON error:",
-e
-);
-
-showError(
-"Failed loading channels"
-);
-
-return [];
-
-}
-
-}
-
-
-
-(async()=>{
-
-const channels=
-await fetchChannels();
-
-if(!channels.length)
-return;
-
-
-/* render cards */
-renderChannels(
-channels,
-channelId
-);
-
-
-/* select channel */
-let ch=
-channelId
-?channels.find(
-x=>x.id===channelId
-)
-:channels[0];
-
-if(!ch){
-ch=channels[0];
-}
-
-
-/* IMPORTANT:
-your JSON uses:
-url
-cookie
-keyId
-key
-logo
-all supported
-*/
-
-await initPlayer(ch);
-
-})();
-const video=
-document.querySelector('video');
-
-const container=
-document.querySelector(
-'.shaka-video-container'
-);
-
-const overlay=
-document.getElementById(
-'overlay'
-);
-
-const spinner=
-document.getElementById(
-'spinner'
-);
-
-const playButton=
-document.getElementById(
-'playButton'
-);
-
-const goLiveBtn=
-document.getElementById(
-'goLiveBtn'
-);
-
-const liveBar=
-document.getElementById(
-'liveBadgeBar'
-);
+const video=document.getElementById("video");
+const container=document.querySelector(".shaka-video-container");
+const overlay=document.getElementById("overlay");
+const spinner=document.getElementById("spinner");
+const playBtn=document.getElementById("playButton");
+const goLiveBtn=document.getElementById("goLiveBtn");
+const liveBar=document.getElementById("liveBadgeBar");
 
 let player;
 let currentChannel;
 let retries=0;
 
 const channelId=
-new URLSearchParams(
-location.search
-).get("id")||"";
+new URLSearchParams(location.search)
+.get("id")||"";
+
 
 function showPlay(){
-
-spinner.style.display='none';
-
-playButton.style.display='flex';
-
+spinner.style.display="none";
+playBtn.style.display="flex";
 document.getElementById(
-'overlayText'
-).innerText='Tap To Play';
-
+"overlayText"
+).innerText="Tap To Play";
 }
 
 function hideOverlay(){
-overlay.classList.add(
-'hide'
-);
+overlay.classList.add("hide");
 }
 
 async function doPlay(){
-
 try{
 video.muted=false;
 await video.play();
 hideOverlay();
 }catch(e){}
-
 }
 
 overlay.onclick=doPlay;
-playButton.onclick=doPlay;
+playBtn.onclick=doPlay;
 
 
-/* LIVE DVR */
+
+function showError(msg){
+document.getElementById(
+"errorText"
+).innerText=msg;
+
+document.getElementById(
+"errorBox"
+).style.display="flex";
+}
+
+function retryLoad(){
+document.getElementById(
+"errorBox"
+).style.display="none";
+
+retries=0;
+
+loadStream();
+}
+
+window.retryLoad=retryLoad;
+
+
 
 function updateLive(){
 
 if(
-!video.duration ||
-!isFinite(video.duration)
+!video.seekable ||
+!video.seekable.length
 )return;
 
-let diff=
-video.duration-
-video.currentTime;
+let liveEdge=
+video.seekable.end(
+video.seekable.length-1
+);
 
-if(diff>15){
+let lag=
+liveEdge-video.currentTime;
+
+if(lag>15){
 
 liveBar.classList.add(
-'not-live'
+"not-live"
 );
 
 goLiveBtn.style.display=
-'inline-block';
+"inline-block";
 
 }else{
 
 liveBar.classList.remove(
-'not-live'
+"not-live"
 );
 
 goLiveBtn.style.display=
-'none';
+"none";
 
 }
 
@@ -676,45 +564,67 @@ updateLive,
 );
 
 goLiveBtn.onclick=()=>{
-
-if(
-video.seekable.length
-){
+if(video.seekable.length){
 video.currentTime=
 video.seekable.end(
 video.seekable.length-1
 );
 }
-
 };
 
 
-function showError(msg){
 
-document.getElementById(
-'errorText'
-).innerText=msg;
+async function fetchChannels(){
 
-document.getElementById(
-'errorBox'
-).style.display='flex';
+const r=
+await fetch(
+API,
+{cache:"no-store"}
+);
 
-}
+const j=await r.json();
 
-function retryLoad(){
-
-document.getElementById(
-'errorBox'
-).style.display='none';
-
-retries=0;
-
-loadStream();
+return Array.isArray(j)
+?j
+:j.channels||[];
 
 }
 
-window.retryLoad=
-retryLoad;
+
+
+function renderChannels(
+channels,
+active
+){
+
+let html="";
+
+channels.forEach(c=>{
+
+html+=`
+<a class="card ${
+c.id===active?"active":""
+}" href="?id=${c.id}">
+
+<div class="card-logo">
+<img src="${c.logo||""}">
+</div>
+
+<div class="card-name">
+${c.name}
+</div>
+
+</a>
+`;
+
+});
+
+document.getElementById(
+"grid"
+).innerHTML=html;
+
+}
+
 
 
 async function initPlayer(ch){
@@ -722,12 +632,12 @@ async function initPlayer(ch){
 currentChannel=ch;
 
 document.getElementById(
-'channelName'
+"channelName"
 ).innerText=ch.name;
 
 document.getElementById(
-'logo'
-).src=ch.logo||'';
+"logo"
+).src=ch.logo||"";
 
 shaka.polyfill.installAll();
 
@@ -743,33 +653,31 @@ video
 addBigPlayButton:true,
 
 controlPanelElements:[
-'mute',
-'play_pause',
-'time_and_duration',
-'spacer',
-'quality',
-'captions',
-'picture_in_picture',
-'fullscreen'
+"mute",
+"play_pause",
+"time_and_duration",
+"spacer",
+"quality",
+"picture_in_picture",
+"fullscreen"
 ]
 
 });
 
 
 if(
-ch.keyId&&ch.key
+ch.keyId &&
+ch.key
 ){
-
 player.configure({
 drm:{
 clearKeys:{
-[ch.keyId]:
-ch.key
+[ch.keyId]:ch.key
 }
 }
 });
-
 }
+
 
 player.getNetworkingEngine()
 .registerRequestFilter(
@@ -781,97 +689,70 @@ request.headers["Referer"]=
 request.headers["Origin"]=
 "https://www.jiotv.com";
 
-request.headers["User-Agent"]=
-"plaYtv/7.1.5";
-
-
-if(
-currentChannel.cookie
-){
+if(ch.cookie){
 
 request.headers["Cookie"]=
-currentChannel.cookie;
-
-
-/* append hdnea token
-needed for many Jio channels */
+ch.cookie;
 
 if(
 (type===
 shaka.net.NetworkingEngine.RequestType.MANIFEST ||
-
 type===
 shaka.net.NetworkingEngine.RequestType.SEGMENT)
-
 &&
 !request.uris[0].includes(
 "__hdnea__"
 )
-
 ){
 
 let token=
-currentChannel.cookie
-.replace(
+ch.cookie.replace(
 "__hdnea__=",
 ""
 );
 
-let sep=
-request.uris[0]
-.includes("?")
-?"&":"?";
-
 request.uris[0]+=
-sep+
+(
+request.uris[0].includes("?")
+?"&":"?"
+)+
 "__hdnea__="+token;
 
 }
 
 }
 
-
 }
 );
 
-player.configure({
 
+player.configure({
 streaming:{
 lowLatencyMode:true,
 bufferingGoal:15,
 rebufferingGoal:3,
 safeSeekOffset:5
 },
-
 manifest:{
 defaultPresentationDelay:5
 }
-
 });
 
 
 player.addEventListener(
-'error',
+"error",
 ()=>{
-
 if(retries<3){
-
 retries++;
-
 setTimeout(
 loadStream,
 2500
 );
-
-}
-else{
-
+}else{
 showError(
-'Stream unavailable'
+"Stream unavailable"
 );
-
 }
-
 }
 );
 
@@ -891,59 +772,20 @@ currentChannel.url
 
 retries=0;
 
-video.muted=true;
-
 await video.play();
 
 setTimeout(
 showPlay,
-1000
+1200
 );
 
 }
 catch(e){
-
+console.error(e);
 showError(
-'Cannot load stream'
+"Cannot load stream"
 );
-
 }
-
-}
-
-
-
-function renderChannels(
-channels,
-active
-){
-
-let html='';
-
-channels.forEach(c=>{
-
-html+=`
-<a class="card ${
-c.id===active
-?'active':''
-}" href="?id=${c.id}">
-
-<div class="card-logo">
-<img src="${c.logo||''}">
-</div>
-
-<div class="card-name">
-${c.name}
-</div>
-
-</a>
-`;
-
-});
-
-document.getElementById(
-'grid'
-).innerHTML=html;
 
 }
 
@@ -953,36 +795,32 @@ document.getElementById(
 
 try{
 
-const res=
-await fetch(API);
-
-const data=
-await res.json();
-
 const channels=
-Array.isArray(data)
-?data
-:(data.channels||[]);
+await fetchChannels();
 
 renderChannels(
 channels,
 channelId
 );
 
-const ch=
+let ch=
 channelId
 ?channels.find(
-c=>c.id===channelId
+x=>x.id===channelId
 )
 :channels[0];
 
+if(!ch)
+ch=channels[0];
+
 await initPlayer(ch);
 
-}
-catch(e){
+}catch(e){
+
+console.error(e);
 
 showError(
-'Failed loading channels'
+"Failed loading channels"
 );
 
 }
