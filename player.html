@@ -504,243 +504,85 @@ id="grid">
 
 
 <script>
+const API='https://binge-jiotv.pages.dev/data/id.json';
 
-const API=
-'https://binge-jiotv.pages.dev/data/id.json';
+const video=document.querySelector("video");
+const container=document.querySelector(".shaka-video-container");
 
-const video=
-document.querySelector("video");
-
-const container=
-document.querySelector(
-".shaka-video-container"
-);
-
-const overlay=
-document.getElementById(
-"overlay"
-);
-
-const spinner=
-document.getElementById(
-"spinner"
-);
-
-const playButton=
-document.getElementById(
-"playButton"
-);
-
-const overlayText=
-document.getElementById(
-"overlayText"
-);
-
-const errorBox=
-document.getElementById(
-"errorBox"
-);
-
-const liveBar=
-document.getElementById(
-"liveBadgeBar"
-);
-
-const goLiveBtn=
-document.getElementById(
-"goLiveBtn"
-);
+const overlay=document.getElementById("overlay");
+const spinner=document.getElementById("spinner");
+const playButton=document.getElementById("playButton");
+const overlayText=document.getElementById("overlayText");
+const errorBox=document.getElementById("errorBox");
 
 let player;
 let currentChannel;
 let retries=0;
-let liveChecker;
-const MAX_RETRY=3;
+const MAX_RETRY=2;
 
 const channelId=
-new URLSearchParams(
-location.search
-).get("id")||"";
+new URLSearchParams(location.search).get("id")||"";
 
 
 function showPlay(){
-
 spinner.style.display='none';
-
 playButton.style.display='flex';
-
-overlayText.innerText=
-'Tap To Play';
-
+overlayText.textContent='Tap To Play';
 }
 
 function hideOverlay(){
-
-overlay.classList.add(
-'hide'
-);
-
+overlay.classList.add('hide');
 setTimeout(()=>{
 overlay.style.display='none';
 },400);
-
 }
 
 async function doPlay(){
-
 try{
-video.muted=false;
 await video.play();
 hideOverlay();
+}catch(e){
+console.log(e);
 }
-catch{
-video.muted=true;
-await video.play();
-hideOverlay();
-}
-
 }
 
 overlay.onclick=doPlay;
 playButton.onclick=doPlay;
 
-
 function showError(msg){
-
 document.getElementById(
 'errorText'
-).innerText=msg;
+).textContent=msg;
 
 errorBox.style.display='flex';
-
 }
 
 function retryLoad(){
-
 errorBox.style.display='none';
-
 retries=0;
-
 loadStream();
-
 }
-
-/* LIVE DVR */
-
-function goLive(){
-
-if(!player) return;
-
-let r=
-player.seekRange();
-
-video.currentTime=
-r.end-2;
-
-video.play();
-
-updateLiveStatus();
-
-}
-
-goLiveBtn.onclick=
-goLive;
-
-function updateLiveStatus(){
-
-if(!player) return;
-
-try{
-
-let r=
-player.seekRange();
-
-let behind=
-r.end-video.currentTime;
-
-if(behind>15){
-
-liveBar.classList.add(
-'not-live'
-);
-
-goLiveBtn.style.display=
-'inline-block';
-
-}else{
-
-liveBar.classList.remove(
-'not-live'
-);
-
-goLiveBtn.style.display=
-'none';
-
-}
-
-}catch(e){}
-
-}
-
-function startLiveMonitor(){
-
-if(liveChecker)
-clearInterval(
-liveChecker
-);
-
-liveChecker=
-setInterval(
-updateLiveStatus,
-3000
-);
-
-video.addEventListener(
-'seeked',
-updateLiveStatus
-);
-
-video.addEventListener(
-'timeupdate',
-updateLiveStatus
-);
-
-}
-
 
 async function initPlayer(ch){
 
 currentChannel=ch;
 
-document.title=
-ch.name;
-
 document.getElementById(
 'channelName'
-).innerText=
-ch.name;
+).textContent=ch.name;
 
 document.getElementById(
 'logo'
-).src=
-ch.logo||'';
+).src=ch.logo||'';
 
 shaka.polyfill.installAll();
 
-if(
-!shaka.Player
-.isBrowserSupported()
-){
-showError(
-'Browser unsupported'
-);
+if(!shaka.Player.isBrowserSupported()){
+showError("Browser not supported");
 return;
 }
 
-player=
-new shaka.Player(
-video
-);
+player=new shaka.Player(video);
 
 const ui=
 new shaka.ui.Overlay(
@@ -750,115 +592,115 @@ video
 );
 
 ui.configure({
-
 addBigPlayButton:true,
-
 controlPanelElements:[
 'play_pause',
 'time_and_duration',
 'mute',
 'volume',
 'spacer',
-'captions',
 'quality',
-'language',
-'picture_in_picture',
 'fullscreen',
 'overflow_menu'
-],
-
-seekBarColors:{
-base:'rgba(255,255,255,.22)',
-buffered:'rgba(255,255,255,.45)',
-played:'#f07020'
-}
-
+]
 });
 
-if(
-ch.keyId&&ch.key
-){
-player.configure({
-drm:{
-clearKeys:{
-[ch.keyId]:
-ch.key
-}
-}
-});
-}
 
+/* VERY IMPORTANT:
+Remove broken cookie URL rewriting.
+Only light headers.
+*/
 player.getNetworkingEngine()
 .registerRequestFilter(
 (type,request)=>{
 
-request.headers.Referer=
-'https://www.jiotv.com/';
+request.headers["Referer"]=
+"https://www.jiotv.com/";
 
-request.headers.Origin=
-'https://www.jiotv.com';
+request.headers["Origin"]=
+"https://www.jiotv.com";
 
-if(ch.cookie){
-
-request.headers.Cookie=
-ch.cookie;
+/* DO NOT append cookies to URLs
+removed:
+request.uris[0]+=cookie
+this was breaking streams
+*/
 
 if(
-!request.uris[0]
-.includes(
-'__hdnea__='
-)
+ch.cookie &&
+type===shaka.net.NetworkingEngine.RequestType.MANIFEST
 ){
-request.uris[0]+=
-(
-request.uris[0]
-.includes('?')
-?'&':'?'
-)+ch.cookie;
-}
-
+request.headers["Cookie"]=ch.cookie;
 }
 
 }
 );
+
+
+player.configure({
+
+streaming:{
+bufferingGoal:15,
+rebufferingGoal:3,
+bufferBehind:30,
+
+retryParameters:{
+timeout:12000,
+maxAttempts:2,
+baseDelay:2000
+}
+},
+
+manifest:{
+retryParameters:{
+timeout:10000,
+maxAttempts:2
+}
+}
+
+});
+
 
 player.addEventListener(
 'error',
-()=>{
+onPlayerError
+);
 
-if(
-retries<MAX_RETRY
-){
+await loadStream();
+
+}
+
+
+function onPlayerError(event){
+
+console.log(
+"Player error:",
+event.detail
+);
+
+if(retries<MAX_RETRY){
 
 retries++;
 
-overlay.style.display=
-'flex';
+overlay.style.display='flex';
+overlay.classList.remove('hide');
 
-overlay.classList.remove(
-'hide'
-);
-
-overlayText.innerText=
+overlayText.textContent=
 'Retrying '+retries;
 
 setTimeout(
 loadStream,
-3000*retries
+2500
 );
 
-}else{
+}
+else{
 
 showError(
-'Stream unavailable'
+'Stream unavailable. Try another channel.'
 );
 
 }
-
-}
-);
-
-loadStream();
 
 }
 
@@ -867,47 +709,63 @@ async function loadStream(){
 
 try{
 
+overlayText.textContent=
+'Connecting...';
+
 await player.load(
 currentChannel.url
 );
 
 retries=0;
 
+/* Important:
+do not auto pause after play
+*/
+
 video.muted=true;
 
 try{
-
 await video.play();
 
-video.pause();
-
+/* show user play option too */
+setTimeout(()=>{
 showPlay();
-
-startLiveMonitor();
+},1000);
 
 }
 catch{
-
 showPlay();
-
-startLiveMonitor();
-
 }
 
 }
-catch{
+catch(err){
 
-if(
-retries>=MAX_RETRY
-){
-showError(
-'Failed loading stream'
+console.error(
+"Load failed",
+err
 );
-}
+
+if(retries<MAX_RETRY){
+
+retries++;
+
+setTimeout(
+loadStream,
+2500
+);
+
+}else{
+
+showError(
+'Cannot load stream'
+);
 
 }
 
 }
+
+}
+
 
 
 function renderChannels(
@@ -920,13 +778,9 @@ let html='';
 channels.forEach(c=>{
 
 html+=`
-<a
-class="card ${
-c.id===active
-?'active':''
-}"
-href="?id=${c.id}"
->
+<a class="card ${
+c.id===active?'active':''
+}" href="?id=${c.id}">
 <div class="card-logo">
 <img src="${c.logo||''}">
 </div>
@@ -945,17 +799,18 @@ document.getElementById(
 }
 
 
+
 (async()=>{
 
 try{
 
-let res=
+const res=
 await fetch(API);
 
-let data=
+const data=
 await res.json();
 
-let channels=
+const channels=
 Array.isArray(data)
 ?data
 :(data.channels||[]);
@@ -965,7 +820,7 @@ channels,
 channelId
 );
 
-let ch=
+const ch=
 channelId
 ?channels.find(
 c=>c.id===channelId
@@ -984,6 +839,8 @@ await initPlayer(ch);
 }
 catch(e){
 
+console.error(e);
+
 showError(
 'Failed loading channels'
 );
@@ -993,6 +850,7 @@ showError(
 })();
 
 </script>
+
 
 </body>
 </html>
