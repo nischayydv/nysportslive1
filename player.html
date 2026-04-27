@@ -468,9 +468,99 @@ id="grid">
 
 <script>
 
-const API=
-'https://binge-jiotv.pages.dev/data/id.json';
+const API='https://binge-jiotv.pages.dev/data/id.json';
 
+
+async function fetchChannels(){
+
+try{
+
+const res=await fetch(
+API,
+{
+cache:"no-store"
+}
+);
+
+const data=await res.json();
+
+/* supports your exact format */
+if(
+data &&
+Array.isArray(data.channels)
+){
+return data.channels;
+}
+
+/* fallback if array */
+if(Array.isArray(data)){
+return data;
+}
+
+throw "Bad JSON";
+
+}
+catch(e){
+
+console.error(
+"Channel JSON error:",
+e
+);
+
+showError(
+"Failed loading channels"
+);
+
+return [];
+
+}
+
+}
+
+
+
+(async()=>{
+
+const channels=
+await fetchChannels();
+
+if(!channels.length)
+return;
+
+
+/* render cards */
+renderChannels(
+channels,
+channelId
+);
+
+
+/* select channel */
+let ch=
+channelId
+?channels.find(
+x=>x.id===channelId
+)
+:channels[0];
+
+if(!ch){
+ch=channels[0];
+}
+
+
+/* IMPORTANT:
+your JSON uses:
+url
+cookie
+keyId
+key
+logo
+all supported
+*/
+
+await initPlayer(ch);
+
+})();
 const video=
 document.querySelector('video');
 
@@ -685,32 +775,64 @@ player.getNetworkingEngine()
 .registerRequestFilter(
 (type,request)=>{
 
-request.headers[
-"Referer"
-]="https://www.jiotv.com/";
+request.headers["Referer"]=
+"https://www.jiotv.com/";
 
-request.headers[
-"Origin"
-]="https://www.jiotv.com";
+request.headers["Origin"]=
+"https://www.jiotv.com";
 
-request.headers[
-"User-Agent"
-]="plaYtv/7.1.5";
+request.headers["User-Agent"]=
+"plaYtv/7.1.5";
+
 
 if(
-ch.cookie &&
-type===shaka.net
-.NetworkingEngine
-.RequestType.MANIFEST
+currentChannel.cookie
 ){
-request.headers[
-"Cookie"
-]=ch.cookie;
+
+request.headers["Cookie"]=
+currentChannel.cookie;
+
+
+/* append hdnea token
+needed for many Jio channels */
+
+if(
+(type===
+shaka.net.NetworkingEngine.RequestType.MANIFEST ||
+
+type===
+shaka.net.NetworkingEngine.RequestType.SEGMENT)
+
+&&
+!request.uris[0].includes(
+"__hdnea__"
+)
+
+){
+
+let token=
+currentChannel.cookie
+.replace(
+"__hdnea__=",
+""
+);
+
+let sep=
+request.uris[0]
+.includes("?")
+?"&":"?";
+
+request.uris[0]+=
+sep+
+"__hdnea__="+token;
+
 }
+
+}
+
 
 }
 );
-
 
 player.configure({
 
