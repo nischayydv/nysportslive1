@@ -1,63 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NY Cricket Dev Tools</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        .dt{background:#0a0a0a;border:1px solid #1f1f1f;border-radius:10px;font-family:'Courier New',monospace;overflow:hidden;color:#d4d4d4;min-height:520px;display:flex;flex-direction:column;max-width: 900px;margin: 20px auto;}
+        .dt-bar{background:#111;border-bottom:1px solid #1f1f1f;padding:8px 14px;display:flex;align-items:center;gap:10px}
+        .dot{width:11px;height:11px;border-radius:50%}
+        .dt-title{flex:1;text-align:center;font-size:11px;color:#555;letter-spacing:2px;text-transform:uppercase}
+        .dt-tabs{display:flex;border-bottom:1px solid #1f1f1f;background:#0d0d0d}
+        .tab{padding:8px 16px;font-size:11px;cursor:pointer;color:#555;letter-spacing:1px;border-bottom:2px solid transparent;transition:all .15s}
+        .tab.on{color:#f07020;border-color:#f07020}
+        .tab:hover:not(.on){color:#999}
+        .pane{display:none;flex:1;flex-direction:column}
+        .pane.on{display:flex}
 
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-.dt{background:#0a0a0a;border:1px solid #1f1f1f;border-radius:10px;font-family:'Courier New',monospace;overflow:hidden;color:#d4d4d4;min-height:520px;display:flex;flex-direction:column}
-.dt-bar{background:#111;border-bottom:1px solid #1f1f1f;padding:8px 14px;display:flex;align-items:center;gap:10px}
-.dot{width:11px;height:11px;border-radius:50%}
-.dt-title{flex:1;text-align:center;font-size:11px;color:#555;letter-spacing:2px;text-transform:uppercase}
-.dt-tabs{display:flex;border-bottom:1px solid #1f1f1f;background:#0d0d0d}
-.tab{padding:8px 16px;font-size:11px;cursor:pointer;color:#555;letter-spacing:1px;border-bottom:2px solid transparent;transition:all .15s}
-.tab.on{color:#f07020;border-color:#f07020}
-.tab:hover:not(.on){color:#999}
-.pane{display:none;flex:1;flex-direction:column}
-.pane.on{display:flex}
+        /* Terminal */
+        .term{flex:1;overflow-y:auto;padding:12px 14px;font-size:12px;line-height:1.7;max-height:350px;background: #050505;}
+        .term::-webkit-scrollbar{width:4px}.term::-webkit-scrollbar-thumb{background:#2a2a2a}
+        .t-line{display:block;white-space:pre-wrap;word-break:break-all}
+        .t-ok{color:#3fb950}.t-err{color:#f85149}.t-warn{color:#e3b341}.t-info{color:#58a6ff}.t-dim{color:#555}.t-orange{color:#f07020}.t-val{color:#ce9178}
+        .term-input-row{display:flex;align-items:center;gap:8px;padding:8px 14px;border-top:1px solid #1a1a1a;background:#0d0d0d}
+        .term-prompt{color:#f07020;font-size:12px;white-space:nowrap}
+        .term-input{flex:1;background:transparent;border:none;outline:none;color:#d4d4d4;font-family:'Courier New',monospace;font-size:12px;caret-color:#f07020}
 
-/* Terminal */
-.term{flex:1;overflow-y:auto;padding:12px 14px;font-size:12px;line-height:1.7;max-height:300px}
-.term::-webkit-scrollbar{width:4px}.term::-webkit-scrollbar-thumb{background:#2a2a2a}
-.t-line{display:block;white-space:pre-wrap;word-break:break-all}
-.t-ok{color:#3fb950}.t-err{color:#f85149}.t-warn{color:#e3b341}.t-info{color:#58a6ff}.t-dim{color:#555}.t-orange{color:#f07020}.t-val{color:#ce9178}
-.term-input-row{display:flex;align-items:center;gap:8px;padding:8px 14px;border-top:1px solid #1a1a1a;background:#0d0d0d}
-.term-prompt{color:#f07020;font-size:12px;white-space:nowrap}
-.term-input{flex:1;background:transparent;border:none;outline:none;color:#d4d4d4;font-family:'Courier New',monospace;font-size:12px;caret-color:#f07020}
+        /* Sections */
+        .section{padding:12px 14px;border-bottom:1px solid #161616}
+        .sec-label{font-size:10px;color:#555;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+        .field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
+        .field{background:#111;border:1px solid #1f1f1f;border-radius:5px;padding:7px 10px}
+        .field label{display:block;font-size:10px;color:#555;margin-bottom:3px;letter-spacing:1px}
+        .field input,.field select,.field textarea{width:100%;background:transparent;border:none;outline:none;color:#ce9178;font-family:'Courier New',monospace;font-size:11px;resize:none}
+        .field textarea{height:44px}
+        .field.full{grid-column:1/-1}
+        .btn-row{display:flex;gap:8px;padding:10px 14px 12px;flex-wrap:wrap}
+        .btn{padding:6px 14px;border-radius:4px;border:none;cursor:pointer;font-family:'Courier New',monospace;font-size:11px;font-weight:600;letter-spacing:.8px;transition:opacity .15s}
+        .btn:hover{opacity:.8}
+        .btn-orange{background:#f07020;color:#0a0a0a}
+        .btn-gray{background:#1f1f1f;color:#ccc}
+        .btn-red{background:#3d1a1a;color:#f85149;border:1px solid #5a1a1a}
+        .btn-green{background:#1a2e1a;color:#3fb950;border:1px solid #1a4d1a}
 
-/* Sections */
-.section{padding:12px 14px;border-bottom:1px solid #161616}
-.sec-label{font-size:10px;color:#555;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
-.field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
-.field{background:#111;border:1px solid #1f1f1f;border-radius:5px;padding:7px 10px}
-.field label{display:block;font-size:10px;color:#555;margin-bottom:3px;letter-spacing:1px}
-.field input,.field select,.field textarea{width:100%;background:transparent;border:none;outline:none;color:#ce9178;font-family:'Courier New',monospace;font-size:11px;resize:none}
-.field textarea{height:44px}
-.field.full{grid-column:1/-1}
-.btn-row{display:flex;gap:8px;padding:10px 14px 12px;flex-wrap:wrap}
-.btn{padding:6px 14px;border-radius:4px;border:none;cursor:pointer;font-family:'Courier New',monospace;font-size:11px;font-weight:600;letter-spacing:.8px;transition:opacity .15s}
-.btn:hover{opacity:.8}
-.btn-orange{background:#f07020;color:#0a0a0a}
-.btn-gray{background:#1f1f1f;color:#ccc}
-.btn-red{background:#3d1a1a;color:#f85149;border:1px solid #5a1a1a}
-.btn-green{background:#1a2e1a;color:#3fb950;border:1px solid #1a4d1a}
+        /* JSON viewer */
+        .json-area{flex:1;padding:12px 14px;font-size:11px;line-height:1.6;overflow-y:auto;max-height:380px}
+        .json-area::-webkit-scrollbar{width:4px}.json-area::-webkit-scrollbar-thumb{background:#2a2a2a}
+        .j-key{color:#9cdcfe}.j-str{color:#ce9178}.j-num{color:#b5cea8}.j-bool{color:#569cd6}.j-null{color:#569cd6}
 
-/* JSON viewer */
-.json-area{flex:1;padding:12px 14px;font-size:11px;line-height:1.6;overflow-y:auto;max-height:380px}
-.json-area::-webkit-scrollbar{width:4px}.json-area::-webkit-scrollbar-thumb{background:#2a2a2a}
-.j-key{color:#9cdcfe}.j-str{color:#ce9178}.j-num{color:#b5cea8}.j-bool{color:#569cd6}.j-null{color:#569cd6}
+        /* Status bar */
+        .status-bar{background:#1a1a1a;border-top:1px solid #1f1f1f;padding:5px 14px;display:flex;align-items:center;gap:12px;font-size:10px;color:#555}
+        .s-dot{width:7px;height:7px;border-radius:50%;background:#3fb950;animation:blink 2s infinite}
+        @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
-/* Status bar */
-.status-bar{background:#1a1a1a;border-top:1px solid #1f1f1f;padding:5px 14px;display:flex;align-items:center;gap:12px;font-size:10px;color:#555}
-.s-dot{width:7px;height:7px;border-radius:50%;background:#3fb950;animation:blink 2s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-
-/* Table */
-.ch-table{width:100%;border-collapse:collapse;font-size:11px}
-.ch-table th{color:#555;text-align:left;padding:5px 8px;border-bottom:1px solid #1a1a1a;font-weight:400;letter-spacing:1px;text-transform:uppercase;font-size:10px}
-.ch-table td{padding:5px 8px;border-bottom:1px solid #111;vertical-align:middle}
-.ch-table tr:hover td{background:#111}
-.copy-btn{background:#1f1f1f;border:none;color:#888;cursor:pointer;font-size:10px;padding:2px 6px;border-radius:3px;font-family:'Courier New',monospace}
-.copy-btn:hover{color:#f07020}
-.badge{font-size:9px;padding:1px 5px;border-radius:2px;letter-spacing:.5px}
-.b-ok{background:#1a2e1a;color:#3fb950}.b-err{background:#3d1a1a;color:#f85149}.b-warn{background:#2e2010;color:#e3b341}
-</style>
+        /* Table */
+        .ch-table{width:100%;border-collapse:collapse;font-size:11px}
+        .ch-table th{color:#555;text-align:left;padding:5px 8px;border-bottom:1px solid #1a1a1a;font-weight:400;letter-spacing:1px;text-transform:uppercase;font-size:10px}
+        .ch-table td{padding:5px 8px;border-bottom:1px solid #111;vertical-align:middle}
+        .ch-table tr:hover td{background:#111}
+        .copy-btn{background:#1f1f1f;border:none;color:#888;cursor:pointer;font-size:10px;padding:2px 6px;border-radius:3px;font-family:'Courier New',monospace}
+        .copy-btn:hover{color:#f07020}
+        .badge{font-size:9px;padding:1px 5px;border-radius:2px;letter-spacing:.5px}
+        .b-ok{background:#1a2e1a;color:#3fb950}.b-err{background:#3d1a1a;color:#f85149}.b-warn{background:#2e2010;color:#e3b341}
+    </style>
+</head>
+<body>
 
 <div class="dt">
   <div class="dt-bar">
@@ -74,7 +81,6 @@
     <div class="tab" onclick="switchTab('json')">JSON VIEW</div>
   </div>
 
-  <!-- TERMINAL -->
   <div class="pane on" id="pane-terminal">
     <div class="term" id="term"></div>
     <div class="term-input-row">
@@ -83,7 +89,6 @@
     </div>
   </div>
 
-  <!-- STREAM LAB -->
   <div class="pane" id="pane-stream">
     <div class="section">
       <div class="sec-label">Stream Config</div>
@@ -119,7 +124,6 @@
     <div class="term" id="stream-log" style="max-height:140px;padding:8px 14px"></div>
   </div>
 
-  <!-- CHANNELS -->
   <div class="pane" id="pane-channels">
     <div class="section" style="flex:1;overflow-y:auto;padding-bottom:0">
       <div class="sec-label" style="display:flex;align-items:center;justify-content:space-between">
@@ -135,7 +139,6 @@
     </div>
   </div>
 
-  <!-- JSON VIEW -->
   <div class="pane" id="pane-json">
     <div style="padding:8px 14px;border-bottom:1px solid #161616;display:flex;gap:8px;align-items:center">
       <input id="json-url" style="flex:1;background:#111;border:1px solid #1f1f1f;border-radius:4px;padding:5px 9px;color:#ce9178;font-family:'Courier New',monospace;font-size:11px;outline:none" value="https://binge-jiotv.pages.dev/data/id.json">
@@ -154,13 +157,15 @@
 
 <script>
 const API = 'https://binge-jiotv.pages.dev/data/id.json';
+const PLAYER_BASE = 'https://ny-sports-live.vercel.app/player.html';
 let rawJSON = null;
 
 function ts(){const n=new Date();return n.toTimeString().slice(0,8)}
 function setStatus(t){document.getElementById('stat-txt').textContent=t;document.getElementById('stat-time').textContent=ts()}
 
 function switchTab(id){
-  document.querySelectorAll('.tab').forEach((t,i)=>{const ids=['terminal','stream','channels','json'];t.classList.toggle('on',ids[i]===id)});
+  const ids=['terminal','stream','channels','json'];
+  document.querySelectorAll('.tab').forEach((t,i)=>{t.classList.toggle('on',ids[i]===id)});
   document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
   document.getElementById('pane-'+id).classList.add('on');
 }
@@ -177,7 +182,14 @@ function tlog(el,msg,cls=''){
 const cmds={
   help:()=>{
     tlog('term','Available commands:','t-orange');
-    ['help       — show this','fetch      — fetch channel API','channels   — list channels','build <id> — build player URL for channel id','clear      — clear terminal','version    — show version','ping       — ping API endpoint'].forEach(c=>tlog('term','  '+c,'t-dim'));
+    ['help        — show this',
+     'fetch       — fetch channel API',
+     'fetchurl <id> — get player link with header',
+     'channels    — list channels',
+     'build <id>  — build custom player URL',
+     'clear       — clear terminal',
+     'version     — show version',
+     'ping        — ping API endpoint'].forEach(c=>tlog('term','  '+c,'t-dim'));
   },
   fetch:async()=>{
     tlog('term',`[${ts()}] Fetching ${API}...`,'t-info');
@@ -189,14 +201,33 @@ const cmds={
       setStatus(d.length+' channels loaded');
     }catch(e){tlog('term','[ERR] '+e.message,'t-err')}
   },
+  fetchurl:async(arg)=>{
+    if(!arg){tlog('term','Usage: fetchurl <channel-id>','t-warn');return}
+    if(!rawJSON){await cmds.fetch()}
+    if(!rawJSON)return;
+
+    const channel = rawJSON.find(c => c.id.toLowerCase() === arg.toLowerCase());
+    if(channel){
+        const fullUrl = `${PLAYER_BASE}?id=${encodeURIComponent(channel.id)}`;
+        tlog('term','','');
+        tlog('term','----------------------------------','t-dim');
+        tlog('term',channel.name.toUpperCase(),'t-orange');
+        tlog('term',fullUrl,'t-info');
+        tlog('term','----------------------------------','t-dim');
+        navigator.clipboard.writeText(fullUrl);
+        setStatus('Link copied to clipboard');
+    } else {
+        tlog('term',`Channel ID "${arg}" not found.`,'t-err');
+    }
+  },
   channels:async()=>{
     if(!rawJSON){await cmds.fetch()}
     if(!rawJSON)return;
-    tlog('term','ID          NAME','t-orange');
+    tlog('term','ID           NAME','t-orange');
     rawJSON.forEach(c=>tlog('term',c.id.padEnd(12)+c.name,'t-dim'));
   },
   clear:()=>{document.getElementById('term').innerHTML=''},
-  version:()=>{tlog('term','NY Cricket Live Dev Tools v1.0.0','t-orange');tlog('term','Build: 2025 · Engine: Shaka 4.6 · DRM: ClearKey','t-dim')},
+  version:()=>{tlog('term','NY Cricket Live Dev Tools v1.1.0','t-orange');tlog('term','Build: 2026 · Format: Extended Player URL','t-dim')},
   ping:async()=>{
     tlog('term','Pinging API...','t-info');
     const t0=performance.now();
@@ -220,13 +251,13 @@ document.getElementById('termIn').addEventListener('keydown',async e=>{
   tlog('term','NY▸ '+v,'t-orange');
   const [cmd,...args]=v.split(' ');
   if(cmd==='build'){buildCMD(args[0]);return}
+  if(cmd==='fetchurl'){await cmds.fetchurl(args[0]);return}
   if(cmds[cmd]){await cmds[cmd]();return}
   tlog('term','Unknown command: '+cmd+' (type help)','t-err');
 });
 
 tlog('term','NY Cricket Live Dev Tools','t-orange');
 tlog('term','Type help to see commands','t-dim');
-tlog('term','','');
 
 function buildURL(){
   const url=document.getElementById('s-url').value;
@@ -238,7 +269,7 @@ function buildURL(){
   const p=new URLSearchParams({url,keyId:kid,key:key,cookie:ck});
   const out='player.html?'+p.toString();
   tlog('stream-log','player.html?url=...&keyId='+kid.slice(0,8)+'...','t-val');
-  navigator.clipboard.writeText(out).then(()=>tlog('stream-log','[OK] Copied to clipboard!','t-ok')).catch(()=>tlog('stream-log','[WARN] Copy failed — see console','t-warn'));
+  navigator.clipboard.writeText(out).then(()=>tlog('stream-log','[OK] Copied to clipboard!','t-ok')).catch(()=>tlog('stream-log','[WARN] Copy failed','t-warn'));
   setStatus('URL built & copied');
 }
 
@@ -249,10 +280,8 @@ async function testStream(){
   setStatus('Testing stream...');
   try{
     const r=await fetch(url,{method:'HEAD',mode:'no-cors'});
-    tlog('stream-log','[OK] Server reachable (CORS policy may still block in browser)','t-ok');
-  }catch(e){
-    tlog('stream-log','[ERR] '+e.message,'t-err');
-  }
+    tlog('stream-log','[OK] Server reachable (CORS policy may apply)','t-ok');
+  }catch(e){tlog('stream-log','[ERR] '+e.message,'t-err')}
   setStatus('Stream test done');
 }
 
@@ -294,7 +323,7 @@ async function loadChannels(){
         <td style="color:#d4d4d4;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.name}</td>
         <td><span class="badge ${hasDRM?'b-ok':'b-err'}">${hasDRM?'YES':'NO'}</span></td>
         <td><span class="badge ${hasCK?'b-ok':'b-warn'}">${hasCK?'SET':'MISSING'}</span></td>
-        <td><button class="copy-btn" onclick="copyURL('${c.id}')">OPEN</button></td>
+        <td><button class="copy-btn" onclick="copyURL('${c.id}')">LINK</button></td>
       `;
       tb.appendChild(tr);
     });
@@ -305,7 +334,7 @@ async function loadChannels(){
 }
 
 function copyURL(id){
-  const url='player.html?id='+encodeURIComponent(id);
+  const url=PLAYER_BASE+'?id='+encodeURIComponent(id);
   navigator.clipboard.writeText(url).catch(()=>{});
   setStatus('Copied: '+url);
 }
@@ -344,3 +373,5 @@ function copyJSON(){
 
 setInterval(()=>{document.getElementById('stat-time').textContent=ts()},1000);
 </script>
+</body>
+</html>
