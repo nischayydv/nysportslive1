@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport"
-content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+content="width=device-width,initial-scale=1,maximum-scale=1">
 
 <title>NY Cricket Live</title>
 
@@ -43,19 +43,16 @@ left:0;
 right:0;
 height:56px;
 display:flex;
-align-items:center;
 justify-content:space-between;
+align-items:center;
 padding:0 16px;
 background:rgba(10,10,10,.96);
-backdrop-filter:blur(14px);
+backdrop-filter:blur(12px);
 border-bottom:1px solid var(--border);
 z-index:9999;
 }
 
 .logo{
-display:flex;
-gap:10px;
-align-items:center;
 font-family:'Bebas Neue';
 font-size:22px;
 letter-spacing:2px;
@@ -68,17 +65,17 @@ color:var(--orange);
 .live-pill{
 background:var(--orange);
 padding:4px 10px;
+border-radius:4px;
 font-size:11px;
 font-weight:700;
-border-radius:3px;
 }
 
 .back{
 text-decoration:none;
 color:#fff;
 font-size:13px;
-border:1px solid #333;
 padding:7px 12px;
+border:1px solid #333;
 border-radius:6px;
 }
 
@@ -91,12 +88,12 @@ padding-top:56px;
 .player-wrap{
 max-width:900px;
 margin:auto;
-background:#000;
 }
 
 .player-box{
 position:relative;
 padding-top:56.25%;
+background:#000;
 }
 
 .shaka-video-container{
@@ -112,28 +109,11 @@ object-fit:contain;
 background:#000;
 }
 
-/* FIX SHAKA CONTROLS */
+/* SHAKA */
 
 .shaka-controls-container,
 .shaka-bottom-controls{
 z-index:9500!important;
-}
-
-.shaka-play-pause-button,
-.shaka-fullscreen-button,
-.shaka-overflow-menu-button{
-display:flex!important;
-visibility:visible!important;
-opacity:1!important;
-}
-
-.shaka-volume-bar-container{
-width:72px!important;
-opacity:1!important;
-}
-
-.shaka-seek-bar{
-background:rgba(255,255,255,.22)!important;
 }
 
 .shaka-played-range{
@@ -144,6 +124,10 @@ background:#f07020!important;
 background:rgba(255,255,255,.45)!important;
 }
 
+.shaka-seek-bar{
+background:rgba(255,255,255,.2)!important;
+}
+
 .shaka-seek-bar-container{
 height:5px!important;
 }
@@ -152,17 +136,57 @@ height:5px!important;
 height:8px!important;
 }
 
-/* HOTSTAR LIVE PILL ON SEEK BAR */
+.shaka-volume-bar-container{
+width:70px!important;
+opacity:1!important;
+}
 
-.shaka-seek-bar-container::after{
-content:'LIVE';
+/* LIVE badge */
+
+#liveBadgeBar{
 position:absolute;
-right:-48px;
-top:-8px;
-background:#ff2b2b;
-padding:4px 10px;
-font-size:10px;
-border-radius:18px;
+right:18px;
+bottom:64px;
+display:flex;
+gap:10px;
+align-items:center;
+padding:8px 14px;
+background:rgba(0,0,0,.75);
+border:1px solid rgba(240,112,32,.35);
+border-radius:30px;
+z-index:9300;
+font-size:12px;
+font-weight:700;
+}
+
+#liveDot{
+width:8px;
+height:8px;
+background:red;
+border-radius:50%;
+animation:pulse 1.5s infinite;
+}
+
+@keyframes pulse{
+50%{
+transform:scale(1.4);
+opacity:.5;
+}
+}
+
+.not-live #liveDot{
+background:#999;
+animation:none;
+}
+
+#goLiveBtn{
+display:none;
+border:0;
+background:#f07020;
+color:#fff;
+padding:6px 12px;
+border-radius:20px;
+cursor:pointer;
 font-weight:700;
 }
 
@@ -176,13 +200,12 @@ flex-direction:column;
 justify-content:center;
 align-items:center;
 gap:18px;
-z-index:120;
+z-index:100;
 background:linear-gradient(
 to bottom,
-rgba(0,0,0,.25),
-rgba(0,0,0,.68)
+rgba(0,0,0,.2),
+rgba(0,0,0,.65)
 );
-transition:.35s;
 }
 
 #overlay.hide{
@@ -195,7 +218,7 @@ pointer-events:none;
 width:54px;
 height:54px;
 border-radius:50%;
-border:4px solid rgba(255,255,255,.18);
+border:4px solid rgba(255,255,255,.15);
 border-top-color:#f07020;
 animation:spin .8s linear infinite;
 }
@@ -215,23 +238,15 @@ border-radius:50%;
 justify-content:center;
 align-items:center;
 cursor:pointer;
-box-shadow:0 0 25px rgba(240,112,32,.45);
 }
 
 #playButton svg{
 width:32px;
-height:32px;
 fill:#fff;
 margin-left:4px;
 }
 
-#overlayText{
-font-size:14px;
-font-weight:700;
-letter-spacing:1px;
-}
-
-/* WATERMARK */
+/* watermark */
 
 #watermark{
 position:absolute;
@@ -239,58 +254,8 @@ left:14px;
 top:62%;
 width:54px;
 opacity:.35;
-pointer-events:none;
 z-index:700;
-}
-
-/* LIVE DVR BAR */
-
-#liveBadgeBar{
-position:absolute;
-right:18px;
-bottom:64px;
-display:flex;
-gap:10px;
-align-items:center;
-padding:8px 12px;
-border-radius:30px;
-background:rgba(0,0,0,.75);
-backdrop-filter:blur(8px);
-border:1px solid rgba(240,112,32,.35);
-z-index:9400;
-font-size:12px;
-font-weight:700;
-}
-
-#liveDot{
-width:9px;
-height:9px;
-background:#ff2b2b;
-border-radius:50%;
-animation:pulse 1.4s infinite;
-}
-
-@keyframes pulse{
-50%{
-transform:scale(1.45);
-opacity:.5;
-}
-}
-
-.not-live #liveDot{
-background:#999;
-animation:none;
-}
-
-#goLiveBtn{
-display:none;
-background:#f07020;
-color:#fff;
-border:0;
-padding:7px 14px;
-border-radius:20px;
-cursor:pointer;
-font-weight:700;
+pointer-events:none;
 }
 
 /* ERROR */
@@ -301,18 +266,17 @@ position:absolute;
 inset:0;
 background:#000;
 z-index:10000;
-flex-direction:column;
 justify-content:center;
 align-items:center;
-gap:20px;
+flex-direction:column;
+gap:22px;
 }
 
 #errorBox button{
-padding:11px 28px;
-background:#f07020;
 border:0;
-color:white;
-font-weight:700;
+background:#f07020;
+color:#fff;
+padding:12px 28px;
 cursor:pointer;
 }
 
@@ -331,16 +295,16 @@ border-bottom:1px solid var(--border);
 .info img{
 width:56px;
 height:56px;
-background:#111;
 border-radius:8px;
+background:#111;
 }
 
 .channel-name{
 font-family:'Bebas Neue';
-font-size:23px;
+font-size:22px;
 }
 
-/* RELATED */
+/* related */
 
 .related{
 max-width:900px;
@@ -351,7 +315,6 @@ padding:20px;
 .title{
 font-family:'Bebas Neue';
 font-size:20px;
-letter-spacing:2px;
 margin-bottom:14px;
 }
 
@@ -363,11 +326,11 @@ gap:10px;
 
 .card{
 text-decoration:none;
+color:#fff;
 background:#111;
 border:1px solid var(--border);
 border-radius:8px;
 overflow:hidden;
-color:#fff;
 }
 
 .card.active{
@@ -377,10 +340,10 @@ border-color:#f07020;
 .card-logo{
 height:70px;
 display:flex;
-justify-content:center;
 align-items:center;
-background:#1a1a1a;
+justify-content:center;
 padding:8px;
+background:#1a1a1a;
 }
 
 .card-logo img{
@@ -391,16 +354,16 @@ object-fit:contain;
 
 .card-name{
 padding:8px;
-text-align:center;
 font-size:11px;
 font-weight:700;
+text-align:center;
 }
 
 footer{
-padding:28px;
 text-align:center;
+padding:30px;
 font-size:11px;
-opacity:.65;
+opacity:.6;
 }
 
 </style>
@@ -416,7 +379,7 @@ opacity:.65;
 ● LIVE
 </div>
 
-<a class="back" href="index.html">
+<a href="index.html" class="back">
 All Channels
 </a>
 </header>
@@ -424,6 +387,7 @@ All Channels
 <main>
 
 <div class="player-wrap">
+
 <div class="player-box">
 
 <div class="shaka-video-container">
@@ -431,6 +395,7 @@ All Channels
 <video playsinline></video>
 
 <div id="overlay">
+
 <div id="spinner"></div>
 
 <div id="playButton">
@@ -442,10 +407,10 @@ All Channels
 <div id="overlayText">
 Loading Stream...
 </div>
+
 </div>
 
-<img
-id="watermark"
+<img id="watermark"
 src="https://i.postimg.cc/J4m9Dz70/Gemini-Generated-Image-4zvnud4zvnud4zvn-Picsart-Background-Remover.png">
 
 <div id="liveBadgeBar">
@@ -470,9 +435,8 @@ Retry
 </div>
 </div>
 
-
 <div class="info">
-<img id="logo" src="">
+<img id="logo">
 <div>
 <div
 class="channel-name"
@@ -483,8 +447,8 @@ Loading...
 </div>
 </div>
 
-
 <div class="related">
+
 <div class="title">
 MORE CHANNELS
 </div>
@@ -502,66 +466,166 @@ id="grid">
 © 2025 NY Cricket Live
 </footer>
 
-
 <script>
-const API='https://binge-jiotv.pages.dev/data/id.json';
 
-const video=document.querySelector("video");
-const container=document.querySelector(".shaka-video-container");
+const API=
+'https://binge-jiotv.pages.dev/data/id.json';
 
-const overlay=document.getElementById("overlay");
-const spinner=document.getElementById("spinner");
-const playButton=document.getElementById("playButton");
-const overlayText=document.getElementById("overlayText");
-const errorBox=document.getElementById("errorBox");
+const video=
+document.querySelector('video');
+
+const container=
+document.querySelector(
+'.shaka-video-container'
+);
+
+const overlay=
+document.getElementById(
+'overlay'
+);
+
+const spinner=
+document.getElementById(
+'spinner'
+);
+
+const playButton=
+document.getElementById(
+'playButton'
+);
+
+const goLiveBtn=
+document.getElementById(
+'goLiveBtn'
+);
+
+const liveBar=
+document.getElementById(
+'liveBadgeBar'
+);
 
 let player;
 let currentChannel;
 let retries=0;
-const MAX_RETRY=2;
 
 const channelId=
-new URLSearchParams(location.search).get("id")||"";
-
+new URLSearchParams(
+location.search
+).get("id")||"";
 
 function showPlay(){
+
 spinner.style.display='none';
+
 playButton.style.display='flex';
-overlayText.textContent='Tap To Play';
+
+document.getElementById(
+'overlayText'
+).innerText='Tap To Play';
+
 }
 
 function hideOverlay(){
-overlay.classList.add('hide');
-setTimeout(()=>{
-overlay.style.display='none';
-},400);
+overlay.classList.add(
+'hide'
+);
 }
 
 async function doPlay(){
+
 try{
+video.muted=false;
 await video.play();
 hideOverlay();
-}catch(e){
-console.log(e);
-}
+}catch(e){}
+
 }
 
 overlay.onclick=doPlay;
 playButton.onclick=doPlay;
 
+
+/* LIVE DVR */
+
+function updateLive(){
+
+if(
+!video.duration ||
+!isFinite(video.duration)
+)return;
+
+let diff=
+video.duration-
+video.currentTime;
+
+if(diff>15){
+
+liveBar.classList.add(
+'not-live'
+);
+
+goLiveBtn.style.display=
+'inline-block';
+
+}else{
+
+liveBar.classList.remove(
+'not-live'
+);
+
+goLiveBtn.style.display=
+'none';
+
+}
+
+}
+
+setInterval(
+updateLive,
+2000
+);
+
+goLiveBtn.onclick=()=>{
+
+if(
+video.seekable.length
+){
+video.currentTime=
+video.seekable.end(
+video.seekable.length-1
+);
+}
+
+};
+
+
 function showError(msg){
+
 document.getElementById(
 'errorText'
-).textContent=msg;
+).innerText=msg;
 
-errorBox.style.display='flex';
+document.getElementById(
+'errorBox'
+).style.display='flex';
+
 }
 
 function retryLoad(){
-errorBox.style.display='none';
+
+document.getElementById(
+'errorBox'
+).style.display='none';
+
 retries=0;
+
 loadStream();
+
 }
+
+window.retryLoad=
+retryLoad;
+
 
 async function initPlayer(ch){
 
@@ -569,7 +633,7 @@ currentChannel=ch;
 
 document.getElementById(
 'channelName'
-).textContent=ch.name;
+).innerText=ch.name;
 
 document.getElementById(
 'logo'
@@ -577,60 +641,71 @@ document.getElementById(
 
 shaka.polyfill.installAll();
 
-if(!shaka.Player.isBrowserSupported()){
-showError("Browser not supported");
-return;
-}
+player=
+new shaka.Player(video);
 
-player=new shaka.Player(video);
-
-const ui=
 new shaka.ui.Overlay(
 player,
 container,
 video
-);
+).configure({
 
-ui.configure({
 addBigPlayButton:true,
+
 controlPanelElements:[
+'mute',
 'play_pause',
 'time_and_duration',
-'mute',
-'volume',
 'spacer',
 'quality',
-'fullscreen',
-'overflow_menu'
+'captions',
+'picture_in_picture',
+'fullscreen'
 ]
+
 });
 
 
-/* VERY IMPORTANT:
-Remove broken cookie URL rewriting.
-Only light headers.
-*/
+if(
+ch.keyId&&ch.key
+){
+
+player.configure({
+drm:{
+clearKeys:{
+[ch.keyId]:
+ch.key
+}
+}
+});
+
+}
+
 player.getNetworkingEngine()
 .registerRequestFilter(
 (type,request)=>{
 
-request.headers["Referer"]=
-"https://www.jiotv.com/";
+request.headers[
+"Referer"
+]="https://www.jiotv.com/";
 
-request.headers["Origin"]=
-"https://www.jiotv.com";
+request.headers[
+"Origin"
+]="https://www.jiotv.com";
 
-/* DO NOT append cookies to URLs
-removed:
-request.uris[0]+=cookie
-this was breaking streams
-*/
+request.headers[
+"User-Agent"
+]="plaYtv/7.1.5";
 
 if(
 ch.cookie &&
-type===shaka.net.NetworkingEngine.RequestType.MANIFEST
+type===shaka.net
+.NetworkingEngine
+.RequestType.MANIFEST
 ){
-request.headers["Cookie"]=ch.cookie;
+request.headers[
+"Cookie"
+]=ch.cookie;
 }
 
 }
@@ -640,22 +715,14 @@ request.headers["Cookie"]=ch.cookie;
 player.configure({
 
 streaming:{
+lowLatencyMode:true,
 bufferingGoal:15,
 rebufferingGoal:3,
-bufferBehind:30,
-
-retryParameters:{
-timeout:12000,
-maxAttempts:2,
-baseDelay:2000
-}
+safeSeekOffset:5
 },
 
 manifest:{
-retryParameters:{
-timeout:10000,
-maxAttempts:2
-}
+defaultPresentationDelay:5
 }
 
 });
@@ -663,30 +730,11 @@ maxAttempts:2
 
 player.addEventListener(
 'error',
-onPlayerError
-);
+()=>{
 
-await loadStream();
-
-}
-
-
-function onPlayerError(event){
-
-console.log(
-"Player error:",
-event.detail
-);
-
-if(retries<MAX_RETRY){
+if(retries<3){
 
 retries++;
-
-overlay.style.display='flex';
-overlay.classList.remove('hide');
-
-overlayText.textContent=
-'Retrying '+retries;
 
 setTimeout(
 loadStream,
@@ -697,20 +745,23 @@ loadStream,
 else{
 
 showError(
-'Stream unavailable. Try another channel.'
+'Stream unavailable'
 );
 
 }
 
 }
+);
+
+loadStream();
+
+}
+
 
 
 async function loadStream(){
 
 try{
-
-overlayText.textContent=
-'Connecting...';
 
 await player.load(
 currentChannel.url
@@ -718,49 +769,21 @@ currentChannel.url
 
 retries=0;
 
-/* Important:
-do not auto pause after play
-*/
-
 video.muted=true;
 
-try{
 await video.play();
 
-/* show user play option too */
-setTimeout(()=>{
-showPlay();
-},1000);
-
-}
-catch{
-showPlay();
-}
-
-}
-catch(err){
-
-console.error(
-"Load failed",
-err
-);
-
-if(retries<MAX_RETRY){
-
-retries++;
-
 setTimeout(
-loadStream,
-2500
+showPlay,
+1000
 );
 
-}else{
+}
+catch(e){
 
 showError(
 'Cannot load stream'
 );
-
-}
 
 }
 
@@ -779,14 +802,18 @@ channels.forEach(c=>{
 
 html+=`
 <a class="card ${
-c.id===active?'active':''
+c.id===active
+?'active':''
 }" href="?id=${c.id}">
+
 <div class="card-logo">
 <img src="${c.logo||''}">
 </div>
+
 <div class="card-name">
 ${c.name}
 </div>
+
 </a>
 `;
 
@@ -827,19 +854,10 @@ c=>c.id===channelId
 )
 :channels[0];
 
-if(!ch){
-showError(
-'Channel not found'
-);
-return;
-}
-
 await initPlayer(ch);
 
 }
 catch(e){
-
-console.error(e);
 
 showError(
 'Failed loading channels'
@@ -850,7 +868,6 @@ showError(
 })();
 
 </script>
-
 
 </body>
 </html>
