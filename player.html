@@ -2,492 +2,664 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>NY Cricket Live</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Bebas+Neue&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.6.0/controls.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.6.0/shaka-player.ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.6.0/shaka-player.compiled.min.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-:root {
-  --hs-blue: #0d6efd;
-  --hs-purple: #7b2ff7;
-  --hs-pink: #e040fb;
-  --hs-grad: linear-gradient(135deg, #1a1035 0%, #0d0d1a 100%);
-  --hs-accent: #1967d2;
-  --hs-live: #e53935;
-  --hs-text: #fff;
-  --hs-muted: rgba(255,255,255,0.55);
-  --hs-card: rgba(255,255,255,0.06);
-  --hs-border: rgba(255,255,255,0.09);
-  --hs-bar: #1a1035;
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
 }
 
-* { margin:0; padding:0; box-sizing:border-box; }
-
-html, body {
-  width:100%; min-height:100%;
-  background: var(--hs-grad);
-  color: var(--hs-text);
-  font-family: 'Nunito', sans-serif;
-  overflow-x: hidden;
+body{
+background:#000;
+font-family:Inter,sans-serif;
+color:#fff;
+overflow-x:hidden;
 }
 
-/* ── HEADER ── */
-header {
-  position: fixed; top:0; left:0; right:0; height:56px;
-  display:flex; align-items:center; justify-content:space-between;
-  padding: 0 16px;
-  background: rgba(13,10,30,0.96);
-  backdrop-filter: blur(18px);
-  border-bottom: 1px solid var(--hs-border);
-  z-index: 99999;
+/* top bar */
+
+header{
+height:56px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:0 18px;
+background:#070707;
+border-bottom:1px solid rgba(255,255,255,.08);
+position:fixed;
+left:0;
+right:0;
+top:0;
+z-index:9999;
 }
 
-.logo {
-  font-family: 'Bebas Neue'; font-size:26px; letter-spacing:2px;
-  background: linear-gradient(90deg, #1967d2, #7b2ff7);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+.logo{
+font-size:20px;
+font-weight:800;
+letter-spacing:1px;
 }
 
-.header-right { display:flex; align-items:center; gap:10px; }
-
-.live-badge {
-  display:flex; align-items:center; gap:5px;
-  background: var(--hs-live); padding:4px 10px;
-  border-radius:20px; font-size:10px; font-weight:800; letter-spacing:1px;
-}
-.live-badge-dot { width:6px; height:6px; border-radius:50%; background:#fff; animation: pulse 1s infinite; }
-
-.back-btn {
-  display:flex; align-items:center; gap:6px;
-  text-decoration:none; color:var(--hs-muted);
-  font-size:12px; font-weight:700;
-  background: var(--hs-card); border:1px solid var(--hs-border);
-  padding:6px 12px; border-radius:8px;
-  transition:.2s;
-}
-.back-btn:hover { color:#fff; background:rgba(255,255,255,0.1); }
-
-main { padding-top:56px; }
-
-/* ── PLAYER ── */
-.player-wrap { width:100%; background:#000; position:relative; }
-
-.player-box {
-  position:relative;
-  padding-top: 56.25%;
-  background:#000;
+.livepill{
+background:#e50914;
+padding:5px 12px;
+border-radius:30px;
+font-size:11px;
+font-weight:800;
 }
 
-.shaka-video-container {
-  position:absolute; inset:0; background:#000;
+main{
+padding-top:56px;
 }
 
-video {
-  width:100%; height:100%;
-  object-fit:cover; background:#000;
+/* player */
+
+.player-wrap{
+width:100%;
+background:#000;
 }
 
-/* Override Shaka UI */
-.shaka-controls-container {
-  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 60%) !important;
-  z-index: 9500 !important;
-}
-.shaka-bottom-controls { padding-bottom:14px !important; }
-
-.shaka-seek-bar-container {
-  height:3px !important; margin-bottom:6px !important;
-  cursor: pointer;
-}
-.shaka-seek-bar-container:hover { height:5px !important; }
-.shaka-seek-bar { background: rgba(255,255,255,0.2) !important; border-radius:4px; }
-.shaka-played-range {
-  background: linear-gradient(90deg, #1967d2, #7b2ff7) !important;
-  border-radius:4px;
-}
-.shaka-buffered-range { background: rgba(255,255,255,0.35) !important; }
-.shaka-volume-bar-container { width:80px !important; }
-.shaka-controls-button-panel button { opacity:.85; }
-.shaka-controls-button-panel button:hover { opacity:1; }
-
-/* ── LOADING OVERLAY ── */
-#overlay {
-  position:absolute; inset:0;
-  display:flex; flex-direction:column; justify-content:center; align-items:center; gap:20px;
-  background: rgba(10,8,25,0.7);
-  backdrop-filter: blur(4px);
-  z-index:700;
-  transition: opacity .4s;
-}
-#overlay.hide { opacity:0; pointer-events:none; }
-
-.hs-spinner {
-  position:relative; width:60px; height:60px;
-}
-.hs-spinner::before, .hs-spinner::after {
-  content:''; position:absolute; border-radius:50%; border:3px solid transparent;
-}
-.hs-spinner::before {
-  inset:0;
-  border-top-color: #7b2ff7;
-  border-right-color: #1967d2;
-  animation: spin .9s linear infinite;
-}
-.hs-spinner::after {
-  inset:8px;
-  border-bottom-color: #e040fb;
-  animation: spin .6s linear infinite reverse;
+.player{
+position:relative;
+width:100%;
+padding-top:56.25%;
+background:#000;
+overflow:hidden;
 }
 
-@keyframes spin { to { transform:rotate(360deg); } }
-
-.loading-logo {
-  font-family:'Bebas Neue'; font-size:22px; letter-spacing:2px;
-  background: linear-gradient(90deg, #1967d2, #7b2ff7);
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-}
-.loading-text {
-  font-size:12px; font-weight:700; color:var(--hs-muted); letter-spacing:1.5px;
+video{
+position:absolute;
+inset:0;
+width:100%;
+height:100%;
+object-fit:contain;
+background:#000;
 }
 
-/* ── WATERMARK ── */
-#watermark {
-  position:absolute; left:12px; top:58%;
-  width:44px; opacity:.22; z-index:1000; pointer-events:none;
-  filter: drop-shadow(0 0 6px rgba(121,47,247,0.5));
+/* watermark */
+
+.wm{
+position:absolute;
+left:18px;
+top:58%;
+width:42px;
+opacity:.22;
+z-index:4;
 }
 
-/* ── LIVE PANEL ── */
-#livePanel {
-  position:absolute; right:12px; bottom:60px;
-  display:flex; align-items:center; gap:7px;
-  padding:5px 12px;
-  background: rgba(13,10,30,0.85);
-  border:1px solid rgba(255,255,255,0.12);
-  border-radius:20px;
-  backdrop-filter:blur(10px);
-  z-index:9600; font-size:10px; font-weight:800; letter-spacing:1px;
-}
-#liveDot {
-  width:7px; height:7px; border-radius:50%;
-  background: var(--hs-live);
-  box-shadow: 0 0 6px var(--hs-live);
-  animation: pulse 1.2s infinite;
-}
-@keyframes pulse { 50% { transform:scale(1.5); opacity:.5; } }
+/* loading */
 
-#livePanel.behind #liveDot { background:#666; box-shadow:none; animation:none; }
-
-#goLiveBtn {
-  display:none; border:0;
-  background: linear-gradient(90deg, #1967d2, #7b2ff7);
-  color:#fff; padding:3px 10px; font-size:9px; font-weight:800;
-  border-radius:12px; cursor:pointer; letter-spacing:.5px;
+#loader{
+position:absolute;
+inset:0;
+display:flex;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+gap:18px;
+background:#000;
+z-index:30;
 }
 
-/* ── ERROR BOX ── */
-#errorBox {
-  display:none; position:absolute; inset:0;
-  background: rgba(10,8,25,0.95);
-  z-index:999999; justify-content:center; align-items:center; flex-direction:column; gap:20px;
-}
-#errorBox h2 { font-size:22px; font-weight:900; }
-#errorBox p { color:var(--hs-muted); font-size:13px; }
-.retry-btn {
-  background: linear-gradient(90deg, #1967d2, #7b2ff7);
-  border:0; padding:12px 32px; color:#fff; font-weight:800;
-  border-radius:10px; cursor:pointer; font-size:14px; font-family:'Nunito',sans-serif;
-  transition:.2s;
-}
-.retry-btn:hover { opacity:.85; transform:scale(1.03); }
-
-/* ── INFO BAR ── */
-.info-bar {
-  display:flex; align-items:center; gap:14px;
-  padding:14px 18px;
-  border-bottom:1px solid var(--hs-border);
-  background: rgba(0,0,0,0.3);
-}
-.info-logo {
-  width:48px; height:48px; border-radius:10px;
-  background: rgba(255,255,255,0.06);
-  object-fit:contain; border:1px solid var(--hs-border);
-  padding:4px;
-}
-.info-text .ch-name {
-  font-family:'Bebas Neue'; font-size:22px; letter-spacing:1px;
-  line-height:1;
-}
-.info-text .ch-sub {
-  margin-top:3px; font-size:11px; color:var(--hs-muted); font-weight:700; letter-spacing:.5px;
-  display:flex; align-items:center; gap:6px;
-}
-.tag {
-  background: linear-gradient(90deg, rgba(25,103,210,0.25), rgba(123,47,247,0.25));
-  border:1px solid rgba(123,47,247,0.3);
-  padding:2px 8px; border-radius:4px; font-size:10px; font-weight:800;
+.spin{
+width:58px;
+height:58px;
+border-radius:50%;
+border:4px solid rgba(255,255,255,.15);
+border-top-color:#1e88ff;
+animation:spin .8s linear infinite;
 }
 
-/* ── CHANNEL GRID ── */
-.related { max-width:1280px; margin:auto; padding:20px 16px 30px; }
-
-.section-title {
-  font-family:'Bebas Neue'; font-size:22px; letter-spacing:1.5px;
-  margin-bottom:14px;
-  display:flex; align-items:center; gap:10px;
+@keyframes spin{
+to{
+transform:rotate(360deg)
 }
-.section-title::after {
-  content:''; flex:1; height:1px;
-  background: linear-gradient(90deg, rgba(123,47,247,0.4), transparent);
 }
 
-.grid {
-  display:grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px,1fr));
-  gap:10px;
+/* custom controls */
+
+.controls{
+position:absolute;
+left:0;
+right:0;
+bottom:0;
+padding:0 18px 14px;
+z-index:50;
+opacity:0;
+transition:.25s;
 }
 
-.card {
-  text-decoration:none; color:#fff;
-  background: var(--hs-card);
-  border:1px solid var(--hs-border);
-  border-radius:12px; overflow:hidden;
-  transition:.25s; cursor:pointer;
-}
-.card:hover {
-  transform:translateY(-3px) scale(1.02);
-  border-color: rgba(123,47,247,0.5);
-  box-shadow: 0 8px 24px rgba(123,47,247,0.2);
-}
-.card.active {
-  border-color: #1967d2;
-  box-shadow: 0 0 0 1px #1967d2, 0 8px 20px rgba(25,103,210,0.3);
-}
-.card-logo {
-  height:76px; display:flex; justify-content:center; align-items:center;
-  padding:10px; background: rgba(255,255,255,0.03);
-}
-.card-logo img { width:100%; height:100%; object-fit:contain; }
-.card-name {
-  padding:8px 10px; text-align:center;
-  font-size:10px; font-weight:800; color:var(--hs-muted);
-  letter-spacing:.3px;
-}
-.card.active .card-name { color:#fff; }
-
-footer {
-  text-align:center; padding:24px;
-  font-size:11px; color:var(--hs-muted);
-  border-top:1px solid var(--hs-border);
+.player:hover .controls,
+.player.show-controls .controls{
+opacity:1;
 }
 
-/* ── RESPONSIVE ── */
-@media (max-width:600px) {
-  header { height:50px; padding:0 12px; }
-  .logo { font-size:22px; }
-  main { padding-top:50px; }
-  .info-bar { padding:10px 12px; gap:10px; }
-  .info-logo { width:40px; height:40px; }
-  .info-text .ch-name { font-size:18px; }
-  .grid { grid-template-columns: repeat(auto-fill, minmax(110px,1fr)); gap:8px; }
-  .card-logo { height:60px; }
-  .related { padding:14px 12px 24px; }
-  #livePanel { right:8px; bottom:52px; }
+/* transparent fade only */
+.controls::before{
+content:'';
+position:absolute;
+left:0;
+right:0;
+bottom:0;
+height:110px;
+background:linear-gradient(to top,rgba(0,0,0,.58),transparent);
+pointer-events:none;
+z-index:-1;
+}
+
+/* live dvr bar */
+
+.timeline-wrap{
+margin-bottom:12px;
+}
+
+.live-row{
+display:flex;
+align-items:center;
+gap:10px;
+margin-bottom:8px;
+font-size:11px;
+font-weight:700;
+}
+
+.dot{
+width:8px;
+height:8px;
+border-radius:50%;
+background:red;
+animation:pulse 1.2s infinite;
+}
+
+@keyframes pulse{
+50%{
+transform:scale(1.4);
+opacity:.45;
+}
+}
+
+#goLive{
+border:0;
+background:#e50914;
+color:#fff;
+padding:4px 10px;
+font-size:10px;
+font-weight:800;
+border-radius:16px;
+display:none;
+cursor:pointer;
+}
+
+.timeline{
+height:5px;
+background:rgba(255,255,255,.22);
+border-radius:20px;
+overflow:hidden;
+position:relative;
+cursor:pointer;
+}
+
+.buffer{
+position:absolute;
+height:100%;
+background:rgba(255,255,255,.28);
+width:0%;
+}
+
+.played{
+position:absolute;
+height:100%;
+background:#1e88ff;
+width:100%;
+right:0;
+}
+
+/* bottom buttons */
+
+.control-row{
+display:flex;
+align-items:center;
+justify-content:space-between;
+}
+
+.left,
+.right{
+display:flex;
+align-items:center;
+gap:14px;
+}
+
+.ctrl{
+width:34px;
+height:34px;
+border:0;
+background:none;
+cursor:pointer;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.ctrl svg{
+fill:#fff;
+width:22px;
+height:22px;
+}
+
+/* volume */
+.volbox{
+display:flex;
+align-items:center;
+gap:8px;
+}
+
+#volume{
+width:70px;
+accent-color:#1e88ff;
+}
+
+/* channel info */
+
+.info{
+padding:16px;
+display:flex;
+align-items:center;
+gap:14px;
+border-bottom:1px solid rgba(255,255,255,.07);
+}
+
+.info img{
+width:54px;
+height:54px;
+object-fit:contain;
+border-radius:10px;
+background:#111;
+}
+
+.name{
+font-size:20px;
+font-weight:800;
+}
+
+/* cards */
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+gap:10px;
+padding:18px;
+}
+
+.card{
+background:#101010;
+border:1px solid rgba(255,255,255,.08);
+border-radius:10px;
+overflow:hidden;
+text-decoration:none;
+color:#fff;
+}
+
+.card img{
+width:100%;
+height:70px;
+object-fit:contain;
+padding:8px;
+background:#171717;
+}
+
+.card div{
+padding:8px;
+font-size:11px;
+font-weight:700;
+text-align:center;
+}
+
+@media(max-width:700px){
+#volume{
+width:55px;
+}
+.control-row{
+gap:8px;
+}
 }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">NY CRICKET</div>
-  <div class="header-right">
-    <div class="live-badge"><div class="live-badge-dot"></div>LIVE</div>
-    <a href="index.html" class="back-btn">← Channels</a>
-  </div>
+<div class="logo">NY CRICKET</div>
+<div class="livepill">LIVE</div>
 </header>
 
 <main>
-  <div class="player-wrap">
-    <div class="player-box">
-      <div class="shaka-video-container">
 
-        <video id="video" autoplay muted playsinline></video>
+<div class="player-wrap">
+<div class="player" id="playerWrap">
 
-        <!-- LOADING OVERLAY -->
-        <div id="overlay">
-          <div class="hs-spinner"></div>
-          <div class="loading-logo">NY CRICKET</div>
-          <div class="loading-text">CONNECTING TO LIVE STREAM…</div>
-        </div>
+<video id="video" autoplay muted playsinline></video>
 
-        <!-- WATERMARK -->
-        <img id="watermark"
-          src="https://i.postimg.cc/J4m9Dz70/Gemini-Generated-Image-4zvnud4zvnud4zvn-Picsart-Background-Remover.png"
-          alt="">
+<div id="loader">
+<div class="spin"></div>
+<div>Connecting Live…</div>
+</div>
 
-        <!-- LIVE INDICATOR -->
-        <div id="livePanel">
-          <div id="liveDot"></div>
-          <span>LIVE</span>
-          <button id="goLiveBtn">Go Live</button>
-        </div>
+<img class="wm"
+src="https://i.postimg.cc/J4m9Dz70/Gemini-Generated-Image-4zvnud4zvnud4zvn-Picsart-Background-Remover.png">
 
-        <!-- ERROR -->
-        <div id="errorBox">
-          <h2>⚠ Stream Unavailable</h2>
-          <p>Unable to connect to the live stream.</p>
-          <button class="retry-btn" onclick="loadStream()">Retry</button>
-        </div>
+<!-- CUSTOM HOTSTAR CONTROLS -->
+<div class="controls">
 
-      </div>
-    </div>
-  </div>
+<div class="timeline-wrap">
 
-  <!-- CHANNEL INFO -->
-  <div class="info-bar">
-    <img id="logo" class="info-logo" src="" alt="">
-    <div class="info-text">
-      <div id="channelName" class="ch-name">Loading…</div>
-      <div class="ch-sub">
-        <span class="tag">HD</span>
-        <span class="tag">LIVE</span>
-        <span class="tag">DVR</span>
-        <span>Live Stream</span>
-      </div>
-    </div>
-  </div>
+<div class="live-row">
+<div class="dot"></div>
+LIVE
+<button id="goLive">GO LIVE</button>
+</div>
 
-  <!-- MORE CHANNELS -->
-  <div class="related">
-    <div class="section-title">More Channels</div>
-    <div id="grid" class="grid"></div>
-  </div>
+<div class="timeline" id="timeline">
+<div class="buffer" id="buffer"></div>
+<div class="played" id="played"></div>
+</div>
+
+</div>
+
+<div class="control-row">
+
+<div class="left">
+
+<button class="ctrl" id="playBtn">
+<svg viewBox="0 0 24 24">
+<path d="M8 5v14l11-7z"/>
+</svg>
+</button>
+
+<div class="volbox">
+<button class="ctrl" id="muteBtn">
+<svg viewBox="0 0 24 24">
+<path d="M5 9v6h4l5 5V4L9 9z"/>
+</svg>
+</button>
+
+<input
+type="range"
+id="volume"
+min="0"
+max="1"
+step=".05"
+value="1">
+</div>
+
+</div>
+
+<div class="right">
+
+<button class="ctrl" id="fsBtn">
+<svg viewBox="0 0 24 24">
+<path d="M7 14H5v5h5v-2H7zm0-4h2V7h3V5H5v5zm10 7h-3v2h5v-5h-2zm0-12V5h-5v2h3v3h2z"/>
+</svg>
+</button>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="info">
+<img id="logo">
+<div class="name" id="channelName">Loading...</div>
+</div>
+
+<div class="grid" id="grid"></div>
+
 </main>
 
-<footer>© 2026 NY Cricket Live &nbsp;·&nbsp; All rights reserved</footer>
-
 <script>
-const API = "https://binge-jiotv.pages.dev/data/id.json";
-const video = document.getElementById("video");
-const container = document.querySelector(".shaka-video-container");
+const API="https://binge-jiotv.pages.dev/data/id.json";
 
-let player, currentChannel, retries = 0;
-const channelId = new URLSearchParams(location.search).get("id") || "";
+const video=document.getElementById('video');
+const goLive=document.getElementById('goLive');
+const played=document.getElementById('played');
+const buffer=document.getElementById('buffer');
+const timeline=document.getElementById('timeline');
 
-function hideOverlay() {
-  document.getElementById("overlay").classList.add("hide");
-}
-function showError() {
-  document.getElementById("errorBox").style.display = "flex";
-}
+let player;
+let currentChannel;
 
-async function fetchChannels() {
-  const r = await fetch(API, { cache: "no-store" });
-  const d = await r.json();
-  return Array.isArray(d.channels) ? d.channels : d;
-}
+const id=
+new URLSearchParams(location.search).get('id')||'';
 
-function renderChannels(channels) {
-  document.getElementById("grid").innerHTML = channels.map(c => `
-    <a class="card ${c.id === channelId ? 'active' : ''}" href="?id=${c.id}">
-      <div class="card-logo"><img src="${c.logo}" alt="${c.name}"></div>
-      <div class="card-name">${c.name}</div>
-    </a>
-  `).join('');
+async function getChannels(){
+const r=await fetch(API,{cache:"no-store"});
+const d=await r.json();
+return d.channels||d;
 }
 
-async function initPlayer(ch) {
-  currentChannel = ch;
-  document.getElementById("channelName").innerText = ch.name;
-  document.getElementById("logo").src = ch.logo;
-
-  shaka.polyfill.installAll();
-  player = new shaka.Player(video);
-
-  new shaka.ui.Overlay(player, container, video).configure({
-    addBigPlayButton: false,
-    controlPanelElements: ["mute","play_pause","time_and_duration","spacer","quality","overflow_menu","fullscreen"]
-  });
-
-  if (ch.keyId && ch.key) {
-    player.configure({ drm: { clearKeys: { [ch.keyId]: ch.key } } });
-  }
-
-  player.getNetworkingEngine().registerRequestFilter((type, request) => {
-    request.headers.Referer = "https://www.jiotv.com/";
-    request.headers.Origin  = "https://www.jiotv.com";
-    if (ch.cookie) {
-      request.headers.Cookie = ch.cookie;
-      const token = ch.cookie.replace("__hdnea__=", "");
-      if ((type === 0 || type === 1) && !request.uris[0].includes("__hdnea__")) {
-        const sep = request.uris[0].includes("?") ? "&" : "?";
-        request.uris[0] += sep + "__hdnea__=" + token;
-      }
-    }
-  });
-
-  player.configure({
-    streaming: { lowLatencyMode:true, bufferingGoal:15, rebufferingGoal:3, safeSeekOffset:5 },
-    manifest: { defaultPresentationDelay:5 }
-  });
-
-  player.addEventListener("error", () => {
-    if (retries < 4) { retries++; setTimeout(loadStream, 2000); }
-    else showError();
-  });
-
-  await loadStream();
-  setupLiveDVR();
+function renderCards(list){
+document.getElementById('grid').innerHTML=
+list.map(c=>`
+<a class="card" href="?id=${c.id}">
+<img src="${c.logo}">
+<div>${c.name}</div>
+</a>
+`).join('');
 }
 
-async function loadStream() {
-  try {
-    await player.load(currentChannel.url);
-    retries = 0;
-    await video.play();
-    hideOverlay();
-  } catch(e) {
-    console.error(e);
-    showError();
-  }
+async function init(ch){
+
+currentChannel=ch;
+
+document.getElementById(
+'channelName'
+).innerText=ch.name;
+
+document.getElementById(
+'logo'
+).src=ch.logo;
+
+shaka.polyfill.installAll();
+
+player=new shaka.Player(video);
+
+if(ch.keyId&&ch.key){
+player.configure({
+drm:{
+clearKeys:{
+[ch.keyId]:ch.key
+}
+}
+});
 }
 
-function setupLiveDVR() {
-  setInterval(() => {
-    if (!player) return;
-    const r = player.seekRange();
-    if (!r || !r.end) return;
-    const latency = r.end - video.currentTime;
-    const panel = document.getElementById("livePanel");
-    const btn = document.getElementById("goLiveBtn");
-    if (latency > 8) {
-      panel.classList.add("behind");
-      btn.style.display = "inline-block";
-    } else {
-      panel.classList.remove("behind");
-      btn.style.display = "none";
-    }
-  }, 1000);
+player.getNetworkingEngine()
+.registerRequestFilter(
+(type,req)=>{
 
-  document.getElementById("goLiveBtn").onclick = () => {
-    const r = player.seekRange();
-    if (r && r.end) player.seek(r.end - 1);
-  };
+req.headers.Referer=
+"https://www.jiotv.com/";
+
+if(ch.cookie){
+
+req.headers.Cookie=
+ch.cookie;
+
+let token=
+ch.cookie.replace(
+'__hdnea__=',
+''
+);
+
+if(
+(type===0||type===1)
+&&
+!req.uris[0].includes(
+'__hdnea__'
+)
+){
+let sep=
+req.uris[0].includes('?')
+?'&':'?';
+
+req.uris[0]+=
+sep+
+'__hdnea__='+
+token;
 }
 
-(async () => {
-  try {
-    const channels = await fetchChannels();
-    renderChannels(channels);
-    let ch = channelId ? channels.find(x => x.id === channelId) : channels[0];
-    if (!ch) ch = channels[0];
-    initPlayer(ch);
-  } catch(e) {
-    showError();
-  }
+}
+
+});
+
+await player.load(ch.url);
+
+await video.play();
+
+document.getElementById(
+'loader'
+).style.display='none';
+
+startDVR();
+
+}
+
+/* DVR edge logic */
+function startDVR(){
+
+setInterval(()=>{
+
+let r=
+player.seekRange();
+
+if(!r)return;
+
+let latency=
+r.end-video.currentTime;
+
+let total=
+r.end-r.start;
+
+let pos=
+(video.currentTime-r.start)
+/total*100;
+
+played.style.width=
+pos+'%';
+
+if(latency>10){
+goLive.style.display=
+'inline-block';
+}else{
+goLive.style.display='none';
+}
+
+if(video.buffered.length){
+let b=
+(video.buffered.end(0)-r.start)
+/
+total*100;
+buffer.style.width=b+'%';
+}
+
+},1000);
+
+}
+
+goLive.onclick=()=>{
+let r=player.seekRange();
+player.seek(r.end-1);
+};
+
+/* controls */
+document.getElementById(
+'playBtn'
+).onclick=()=>{
+
+if(video.paused){
+video.play();
+}else{
+video.pause();
+}
+
+};
+
+document.getElementById(
+'muteBtn'
+).onclick=()=>{
+video.muted=!video.muted;
+};
+
+document.getElementById(
+'volume'
+).oninput=e=>{
+video.volume=e.target.value;
+};
+
+document.getElementById(
+'fsBtn'
+).onclick=()=>{
+document.documentElement
+.requestFullscreen();
+};
+
+timeline.onclick=e=>{
+let r=player.seekRange();
+let pct=
+e.offsetX/
+timeline.offsetWidth;
+player.seek(
+r.start+
+((r.end-r.start)*pct)
+);
+};
+
+/* auto hide controls */
+let wrap=
+document.getElementById(
+'playerWrap'
+);
+
+let t;
+wrap.addEventListener(
+'mousemove',
+()=>{
+wrap.classList.add(
+'show-controls'
+);
+clearTimeout(t);
+t=setTimeout(()=>{
+wrap.classList.remove(
+'show-controls'
+);
+},3000);
+}
+);
+
+(async()=>{
+let channels=
+await getChannels();
+
+renderCards(channels);
+
+let ch=
+id
+?channels.find(
+x=>x.id===id
+)
+:channels[0];
+
+if(!ch) ch=channels[0];
+
+init(ch);
+
 })();
 </script>
+
 </body>
 </html>
