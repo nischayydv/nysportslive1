@@ -8,6 +8,7 @@ content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>NY Cricket Live</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+
 <link rel="stylesheet"
 href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.6.0/controls.min.css">
 
@@ -17,8 +18,6 @@ href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.6.0/controls.min.css
 
 :root{
 --orange:#f07020;
---dark:#000;
---card:#111;
 --border:rgba(240,112,32,.18);
 }
 
@@ -44,13 +43,13 @@ left:0;
 right:0;
 height:56px;
 display:flex;
-justify-content:space-between;
 align-items:center;
+justify-content:space-between;
 padding:0 16px;
-background:rgba(10,10,10,.95);
-backdrop-filter:blur(12px);
-z-index:5000;
+background:rgba(10,10,10,.96);
+backdrop-filter:blur(14px);
 border-bottom:1px solid var(--border);
+z-index:9999;
 }
 
 .logo{
@@ -66,7 +65,7 @@ letter-spacing:2px;
 color:var(--orange);
 }
 
-.live{
+.live-pill{
 background:var(--orange);
 padding:4px 10px;
 font-size:11px;
@@ -75,11 +74,11 @@ border-radius:3px;
 }
 
 .back{
-color:white;
 text-decoration:none;
+color:#fff;
 font-size:13px;
 border:1px solid #333;
-padding:6px 12px;
+padding:7px 12px;
 border-radius:6px;
 }
 
@@ -98,7 +97,6 @@ background:#000;
 .player-box{
 position:relative;
 padding-top:56.25%;
-background:#000;
 }
 
 .shaka-video-container{
@@ -111,39 +109,61 @@ video{
 width:100%;
 height:100%;
 object-fit:contain;
+background:#000;
 }
 
 /* FIX SHAKA CONTROLS */
 
 .shaka-controls-container,
 .shaka-bottom-controls{
-z-index:9000 !important;
-}
-
-.shaka-bottom-controls{
-position:relative !important;
+z-index:9500!important;
 }
 
 .shaka-play-pause-button,
 .shaka-fullscreen-button,
 .shaka-overflow-menu-button{
-display:flex !important;
-visibility:visible !important;
-opacity:1 !important;
+display:flex!important;
+visibility:visible!important;
+opacity:1!important;
 }
 
 .shaka-volume-bar-container{
-opacity:1 !important;
-width:70px !important;
-padding:0 6px;
+width:72px!important;
+opacity:1!important;
 }
 
 .shaka-seek-bar{
-background:rgba(255,255,255,.25)!important;
+background:rgba(255,255,255,.22)!important;
 }
 
 .shaka-played-range{
-background:var(--orange)!important;
+background:#f07020!important;
+}
+
+.shaka-buffered-range{
+background:rgba(255,255,255,.45)!important;
+}
+
+.shaka-seek-bar-container{
+height:5px!important;
+}
+
+.shaka-seek-bar-container:hover{
+height:8px!important;
+}
+
+/* HOTSTAR LIVE PILL ON SEEK BAR */
+
+.shaka-seek-bar-container::after{
+content:'LIVE';
+position:absolute;
+right:-48px;
+top:-8px;
+background:#ff2b2b;
+padding:4px 10px;
+font-size:10px;
+border-radius:18px;
+font-weight:700;
 }
 
 /* OVERLAY */
@@ -156,12 +176,12 @@ flex-direction:column;
 justify-content:center;
 align-items:center;
 gap:18px;
+z-index:120;
 background:linear-gradient(
 to bottom,
 rgba(0,0,0,.25),
-rgba(0,0,0,.65)
+rgba(0,0,0,.68)
 );
-z-index:100;
 transition:.35s;
 }
 
@@ -172,51 +192,105 @@ pointer-events:none;
 }
 
 #spinner{
-width:52px;
-height:52px;
+width:54px;
+height:54px;
 border-radius:50%;
-border:4px solid rgba(255,255,255,.15);
-border-top-color:var(--orange);
+border:4px solid rgba(255,255,255,.18);
+border-top-color:#f07020;
 animation:spin .8s linear infinite;
 }
 
 @keyframes spin{
-to{transform:rotate(360deg)}
+to{
+transform:rotate(360deg);
+}
 }
 
 #playButton{
 display:none;
 width:74px;
 height:74px;
+background:#f07020;
 border-radius:50%;
-background:var(--orange);
-align-items:center;
 justify-content:center;
+align-items:center;
 cursor:pointer;
-box-shadow:0 0 25px rgba(240,112,32,.4);
+box-shadow:0 0 25px rgba(240,112,32,.45);
 }
 
 #playButton svg{
 width:32px;
 height:32px;
-fill:white;
-margin-left:5px;
+fill:#fff;
+margin-left:4px;
 }
 
 #overlayText{
-font-weight:700;
 font-size:14px;
+font-weight:700;
 letter-spacing:1px;
 }
+
+/* WATERMARK */
 
 #watermark{
 position:absolute;
 left:14px;
 top:62%;
-width:52px;
+width:54px;
 opacity:.35;
-z-index:500;
 pointer-events:none;
+z-index:700;
+}
+
+/* LIVE DVR BAR */
+
+#liveBadgeBar{
+position:absolute;
+right:18px;
+bottom:64px;
+display:flex;
+gap:10px;
+align-items:center;
+padding:8px 12px;
+border-radius:30px;
+background:rgba(0,0,0,.75);
+backdrop-filter:blur(8px);
+border:1px solid rgba(240,112,32,.35);
+z-index:9400;
+font-size:12px;
+font-weight:700;
+}
+
+#liveDot{
+width:9px;
+height:9px;
+background:#ff2b2b;
+border-radius:50%;
+animation:pulse 1.4s infinite;
+}
+
+@keyframes pulse{
+50%{
+transform:scale(1.45);
+opacity:.5;
+}
+}
+
+.not-live #liveDot{
+background:#999;
+animation:none;
+}
+
+#goLiveBtn{
+display:none;
+background:#f07020;
+color:#fff;
+border:0;
+padding:7px 14px;
+border-radius:20px;
+cursor:pointer;
+font-weight:700;
 }
 
 /* ERROR */
@@ -225,8 +299,8 @@ pointer-events:none;
 display:none;
 position:absolute;
 inset:0;
-z-index:10000;
 background:#000;
+z-index:10000;
 flex-direction:column;
 justify-content:center;
 align-items:center;
@@ -234,37 +308,36 @@ gap:20px;
 }
 
 #errorBox button{
-padding:11px 30px;
-background:var(--orange);
+padding:11px 28px;
+background:#f07020;
 border:0;
-color:#fff;
+color:white;
 font-weight:700;
 cursor:pointer;
 }
 
-/* CHANNEL */
+/* INFO */
 
 .info{
 max-width:900px;
 margin:auto;
+padding:18px;
 display:flex;
-align-items:center;
 gap:14px;
-padding:16px;
+align-items:center;
 border-bottom:1px solid var(--border);
 }
 
 .info img{
 width:56px;
 height:56px;
-border-radius:8px;
 background:#111;
+border-radius:8px;
 }
 
 .channel-name{
 font-family:'Bebas Neue';
-font-size:22px;
-letter-spacing:1px;
+font-size:23px;
 }
 
 /* RELATED */
@@ -279,7 +352,7 @@ padding:20px;
 font-family:'Bebas Neue';
 font-size:20px;
 letter-spacing:2px;
-margin-bottom:15px;
+margin-bottom:14px;
 }
 
 .grid{
@@ -289,16 +362,16 @@ gap:10px;
 }
 
 .card{
+text-decoration:none;
 background:#111;
 border:1px solid var(--border);
 border-radius:8px;
 overflow:hidden;
-text-decoration:none;
-color:white;
+color:#fff;
 }
 
 .card.active{
-border-color:var(--orange);
+border-color:#f07020;
 }
 
 .card-logo{
@@ -318,16 +391,16 @@ object-fit:contain;
 
 .card-name{
 padding:8px;
-font-size:11px;
 text-align:center;
+font-size:11px;
 font-weight:700;
 }
 
 footer{
-padding:30px;
+padding:28px;
 text-align:center;
 font-size:11px;
-opacity:.6;
+opacity:.65;
 }
 
 </style>
@@ -339,7 +412,9 @@ opacity:.6;
 <span>NY</span> CRICKET
 </div>
 
-<div class="live">● LIVE</div>
+<div class="live-pill">
+● LIVE
+</div>
 
 <a class="back" href="index.html">
 All Channels
@@ -349,12 +424,11 @@ All Channels
 <main>
 
 <div class="player-wrap">
-
 <div class="player-box">
 
-<div class="shaka-video-container" data-shaka-player>
+<div class="shaka-video-container">
 
-<video autoplay playsinline></video>
+<video playsinline></video>
 
 <div id="overlay">
 <div id="spinner"></div>
@@ -374,10 +448,19 @@ Loading Stream...
 id="watermark"
 src="https://i.postimg.cc/J4m9Dz70/Gemini-Generated-Image-4zvnud4zvnud4zvn-Picsart-Background-Remover.png">
 
+<div id="liveBadgeBar">
+<div id="liveDot"></div>
+<div>LIVE</div>
+<button id="goLiveBtn">
+Go Live
+</button>
+</div>
+
 <div id="errorBox">
 <div id="errorText">
-Stream error
+Stream Error
 </div>
+
 <button onclick="retryLoad()">
 Retry
 </button>
@@ -387,22 +470,30 @@ Retry
 </div>
 </div>
 
+
 <div class="info">
 <img id="logo" src="">
 <div>
-<div class="channel-name" id="channelName">
+<div
+class="channel-name"
+id="channelName">
 Loading...
 </div>
 <div>LIVE HD STREAM</div>
 </div>
 </div>
 
+
 <div class="related">
 <div class="title">
 MORE CHANNELS
 </div>
 
-<div class="grid" id="grid"></div>
+<div
+class="grid"
+id="grid">
+</div>
+
 </div>
 
 </main>
@@ -421,45 +512,78 @@ const video=
 document.querySelector("video");
 
 const container=
-document.querySelector(".shaka-video-container");
+document.querySelector(
+".shaka-video-container"
+);
 
 const overlay=
-document.getElementById("overlay");
+document.getElementById(
+"overlay"
+);
 
 const spinner=
-document.getElementById("spinner");
+document.getElementById(
+"spinner"
+);
 
 const playButton=
-document.getElementById("playButton");
+document.getElementById(
+"playButton"
+);
 
 const overlayText=
-document.getElementById("overlayText");
+document.getElementById(
+"overlayText"
+);
 
 const errorBox=
-document.getElementById("errorBox");
+document.getElementById(
+"errorBox"
+);
+
+const liveBar=
+document.getElementById(
+"liveBadgeBar"
+);
+
+const goLiveBtn=
+document.getElementById(
+"goLiveBtn"
+);
 
 let player;
 let currentChannel;
 let retries=0;
+let liveChecker;
 const MAX_RETRY=3;
 
-const params=
-new URLSearchParams(location.search);
-
 const channelId=
-params.get("id")||"";
+new URLSearchParams(
+location.search
+).get("id")||"";
+
 
 function showPlay(){
-spinner.style.display="none";
-playButton.style.display="flex";
-overlayText.innerText="Tap To Play";
+
+spinner.style.display='none';
+
+playButton.style.display='flex';
+
+overlayText.innerText=
+'Tap To Play';
+
 }
 
 function hideOverlay(){
-overlay.classList.add("hide");
+
+overlay.classList.add(
+'hide'
+);
+
 setTimeout(()=>{
-overlay.style.display="none";
+overlay.style.display='none';
 },400);
+
 }
 
 async function doPlay(){
@@ -470,75 +594,162 @@ await video.play();
 hideOverlay();
 }
 catch{
-
-try{
 video.muted=true;
 await video.play();
 hideOverlay();
 }
-catch{}
-}
 
 }
 
-overlay.addEventListener(
-"click",
-doPlay
-);
+overlay.onclick=doPlay;
+playButton.onclick=doPlay;
 
-playButton.addEventListener(
-"click",
-doPlay
-);
 
 function showError(msg){
+
 document.getElementById(
-"errorText"
+'errorText'
 ).innerText=msg;
 
-errorBox.style.display="flex";
+errorBox.style.display='flex';
+
 }
 
 function retryLoad(){
-errorBox.style.display="none";
+
+errorBox.style.display='none';
+
 retries=0;
+
 loadStream();
+
 }
 
-async function initPlayer(channel){
+/* LIVE DVR */
 
-currentChannel=channel;
+function goLive(){
+
+if(!player) return;
+
+let r=
+player.seekRange();
+
+video.currentTime=
+r.end-2;
+
+video.play();
+
+updateLiveStatus();
+
+}
+
+goLiveBtn.onclick=
+goLive;
+
+function updateLiveStatus(){
+
+if(!player) return;
+
+try{
+
+let r=
+player.seekRange();
+
+let behind=
+r.end-video.currentTime;
+
+if(behind>15){
+
+liveBar.classList.add(
+'not-live'
+);
+
+goLiveBtn.style.display=
+'inline-block';
+
+}else{
+
+liveBar.classList.remove(
+'not-live'
+);
+
+goLiveBtn.style.display=
+'none';
+
+}
+
+}catch(e){}
+
+}
+
+function startLiveMonitor(){
+
+if(liveChecker)
+clearInterval(
+liveChecker
+);
+
+liveChecker=
+setInterval(
+updateLiveStatus,
+3000
+);
+
+video.addEventListener(
+'seeked',
+updateLiveStatus
+);
+
+video.addEventListener(
+'timeupdate',
+updateLiveStatus
+);
+
+}
+
+
+async function initPlayer(ch){
+
+currentChannel=ch;
 
 document.title=
-channel.name;
+ch.name;
 
 document.getElementById(
-"channelName"
-).innerText=channel.name;
+'channelName'
+).innerText=
+ch.name;
 
 document.getElementById(
-"logo"
-).src=channel.logo||"";
+'logo'
+).src=
+ch.logo||'';
 
 shaka.polyfill.installAll();
 
 if(
-!shaka.Player.isBrowserSupported()
+!shaka.Player
+.isBrowserSupported()
 ){
 showError(
-"Browser not supported"
+'Browser unsupported'
 );
 return;
 }
 
 player=
-new shaka.Player(video);
+new shaka.Player(
+video
+);
 
+const ui=
 new shaka.ui.Overlay(
 player,
 container,
 video
-).configure({
+);
+
+ui.configure({
 
 addBigPlayButton:true,
 
@@ -554,21 +765,27 @@ controlPanelElements:[
 'picture_in_picture',
 'fullscreen',
 'overflow_menu'
-]
+],
+
+seekBarColors:{
+base:'rgba(255,255,255,.22)',
+buffered:'rgba(255,255,255,.45)',
+played:'#f07020'
+}
 
 });
 
-if(channel.keyId&&channel.key){
-
+if(
+ch.keyId&&ch.key
+){
 player.configure({
 drm:{
 clearKeys:{
-[channel.keyId]:
-channel.key
+[ch.keyId]:
+ch.key
 }
 }
 });
-
 }
 
 player.getNetworkingEngine()
@@ -576,26 +793,28 @@ player.getNetworkingEngine()
 (type,request)=>{
 
 request.headers.Referer=
-"https://www.jiotv.com/";
+'https://www.jiotv.com/';
 
 request.headers.Origin=
-"https://www.jiotv.com";
+'https://www.jiotv.com';
 
-if(channel.cookie){
+if(ch.cookie){
 
 request.headers.Cookie=
-channel.cookie;
+ch.cookie;
 
 if(
 !request.uris[0]
-.includes("__hdnea__=")
+.includes(
+'__hdnea__='
+)
 ){
 request.uris[0]+=
 (
 request.uris[0]
-.includes("?")
-?"&":"?"
-)+channel.cookie;
+.includes('?')
+?'&':'?'
+)+ch.cookie;
 }
 
 }
@@ -605,28 +824,35 @@ request.uris[0]
 
 player.addEventListener(
 'error',
-e=>{
+()=>{
 
-if(retries<MAX_RETRY){
+if(
+retries<MAX_RETRY
+){
 
 retries++;
 
-overlay.style.display='flex';
-overlay.classList.remove('hide');
+overlay.style.display=
+'flex';
+
+overlay.classList.remove(
+'hide'
+);
 
 overlayText.innerText=
-"Retrying "+retries;
+'Retrying '+retries;
 
 setTimeout(
 loadStream,
 3000*retries
 );
 
-}
-else{
+}else{
+
 showError(
-"Stream unavailable."
+'Stream unavailable'
 );
+
 }
 
 }
@@ -635,6 +861,7 @@ showError(
 loadStream();
 
 }
+
 
 async function loadStream(){
 
@@ -649,28 +876,39 @@ retries=0;
 video.muted=true;
 
 try{
+
 await video.play();
 
-/* show play button */
 video.pause();
+
 showPlay();
+
+startLiveMonitor();
+
 }
 catch{
+
 showPlay();
+
+startLiveMonitor();
+
 }
 
 }
 catch{
 
-if(retries>=MAX_RETRY){
+if(
+retries>=MAX_RETRY
+){
 showError(
-"Failed loading stream"
+'Failed loading stream'
 );
 }
 
 }
 
 }
+
 
 function renderChannels(
 channels,
@@ -682,10 +920,13 @@ let html='';
 channels.forEach(c=>{
 
 html+=`
-<a class="card ${
+<a
+class="card ${
 c.id===active
 ?'active':''
-}" href="?id=${c.id}">
+}"
+href="?id=${c.id}"
+>
 <div class="card-logo">
 <img src="${c.logo||''}">
 </div>
@@ -702,6 +943,7 @@ document.getElementById(
 ).innerHTML=html;
 
 }
+
 
 (async()=>{
 
@@ -723,23 +965,21 @@ channels,
 channelId
 );
 
-let channel=
+let ch=
 channelId
 ?channels.find(
 c=>c.id===channelId
 )
 :channels[0];
 
-if(!channel){
+if(!ch){
 showError(
 'Channel not found'
 );
 return;
 }
 
-await initPlayer(
-channel
-);
+await initPlayer(ch);
 
 }
 catch(e){
