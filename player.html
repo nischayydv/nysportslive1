@@ -2,664 +2,758 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <title>NY Cricket Live</title>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.6.0/shaka-player.compiled.min.js"></script>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.6.0/controls.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.6.0/shaka-player.ui.min.js"></script>
 
 <style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
+/* ═══════════════════════════════════════
+   RESET + BASE
+═══════════════════════════════════════ */
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --blue:#1967d2;
+  --purple:#7b2ff7;
+  --pink:#e040fb;
+  --red:#e53935;
+  --bg:#0d0a1e;
+  --bg2:#1a1035;
+  --card:rgba(255,255,255,.06);
+  --border:rgba(255,255,255,.09);
+  --muted:rgba(255,255,255,.5);
+}
+html,body{
+  width:100%;min-height:100%;
+  background:linear-gradient(135deg,var(--bg2),var(--bg));
+  color:#fff;font-family:'Nunito',sans-serif;
+  overflow-x:hidden;
 }
 
-body{
-background:#000;
-font-family:Inter,sans-serif;
-color:#fff;
-overflow-x:hidden;
-}
-
-/* top bar */
-
+/* ═══════════════════════════════════════
+   HEADER
+═══════════════════════════════════════ */
 header{
-height:56px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:0 18px;
-background:#070707;
-border-bottom:1px solid rgba(255,255,255,.08);
-position:fixed;
-left:0;
-right:0;
-top:0;
-z-index:9999;
+  position:fixed;top:0;left:0;right:0;height:54px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 18px;
+  background:rgba(10,8,25,.97);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  z-index:99999;
 }
-
 .logo{
-font-size:20px;
-font-weight:800;
-letter-spacing:1px;
+  font-family:'Bebas Neue';font-size:26px;letter-spacing:2px;
+  background:linear-gradient(90deg,var(--blue),var(--purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
 }
-
-.livepill{
-background:#e50914;
-padding:5px 12px;
-border-radius:30px;
-font-size:11px;
-font-weight:800;
+.hdr-right{display:flex;align-items:center;gap:10px;}
+.live-badge{
+  display:flex;align-items:center;gap:5px;
+  background:var(--red);padding:4px 11px;
+  border-radius:20px;font-size:10px;font-weight:800;letter-spacing:1px;
 }
-
-main{
-padding-top:56px;
+.live-badge-dot{
+  width:6px;height:6px;border-radius:50%;background:#fff;
+  animation:blink 1s infinite;
 }
-
-/* player */
-
-.player-wrap{
-width:100%;
-background:#000;
+@keyframes blink{50%{transform:scale(1.6);opacity:.4;}}
+.back-btn{
+  text-decoration:none;color:var(--muted);font-size:12px;font-weight:700;
+  background:var(--card);border:1px solid var(--border);
+  padding:6px 13px;border-radius:8px;transition:.2s;
 }
+.back-btn:hover{color:#fff;background:rgba(255,255,255,.1);}
 
-.player{
-position:relative;
-width:100%;
-padding-top:56.25%;
-background:#000;
-overflow:hidden;
+/* ═══════════════════════════════════════
+   PLAYER
+═══════════════════════════════════════ */
+main{padding-top:54px;}
+.player-wrap{width:100%;background:#000;}
+.player-box{
+  position:relative;padding-top:56.25%;
+  background:#000;overflow:hidden;
 }
+.player-box>*{position:absolute;}
 
 video{
-position:absolute;
-inset:0;
-width:100%;
-height:100%;
-object-fit:contain;
-background:#000;
+  inset:0;width:100%;height:100%;
+  object-fit:cover;background:#000;
+  display:block;cursor:pointer;z-index:1;
 }
 
-/* watermark */
+/* ═══════════════════════════════════════
+   LOADING OVERLAY  (JioHotstar style)
+═══════════════════════════════════════ */
+#overlay{
+  inset:0;z-index:50;
+  display:flex;flex-direction:column;
+  justify-content:center;align-items:center;gap:22px;
+  background:rgba(10,8,25,.85);
+  backdrop-filter:blur(8px);
+  transition:opacity .4s;
+}
+#overlay.hide{opacity:0;pointer-events:none;}
 
-.wm{
-position:absolute;
-left:18px;
-top:58%;
-width:42px;
-opacity:.22;
-z-index:4;
+/* 3-ring spinner */
+.hs-spin{position:relative;width:70px;height:70px;}
+.hs-spin span{
+  position:absolute;border-radius:50%;
+  border:3.5px solid transparent;
+}
+.hs-spin span:nth-child(1){
+  inset:0;
+  border-top-color:var(--blue);
+  border-right-color:var(--purple);
+  animation:rot .9s linear infinite;
+}
+.hs-spin span:nth-child(2){
+  inset:10px;
+  border-bottom-color:var(--pink);
+  animation:rot .55s linear infinite reverse;
+}
+.hs-spin span:nth-child(3){
+  inset:20px;
+  border-top-color:rgba(255,255,255,.25);
+  animation:rot 1.4s linear infinite;
+}
+@keyframes rot{to{transform:rotate(360deg);}}
+
+.load-logo{
+  font-family:'Bebas Neue';font-size:21px;letter-spacing:3px;
+  background:linear-gradient(90deg,var(--blue),var(--purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.load-sub{
+  font-size:11px;font-weight:700;color:var(--muted);
+  letter-spacing:2.5px;text-transform:uppercase;
 }
 
-/* loading */
-
-#loader{
-position:absolute;
-inset:0;
-display:flex;
-align-items:center;
-justify-content:center;
-flex-direction:column;
-gap:18px;
-background:#000;
-z-index:30;
+/* ═══════════════════════════════════════
+   WATERMARK
+═══════════════════════════════════════ */
+#watermark{
+  left:14px;bottom:80px;
+  width:42px;opacity:.18;z-index:5;pointer-events:none;
+  filter:drop-shadow(0 0 6px rgba(123,47,247,.6));
 }
 
-.spin{
-width:58px;
-height:58px;
-border-radius:50%;
-border:4px solid rgba(255,255,255,.15);
-border-top-color:#1e88ff;
-animation:spin .8s linear infinite;
+/* ═══════════════════════════════════════
+   CUSTOM CONTROLS  — ZERO BLACK OVERLAY
+═══════════════════════════════════════ */
+#controls{
+  left:0;right:0;bottom:0;z-index:20;
+  padding:0 14px 10px;
+  /* NO background at all */
+  background:transparent;
+  opacity:0;pointer-events:none;
+  transition:opacity .28s;
+}
+/* show on hover / touch */
+.player-box:hover #controls,
+.player-box.showctrl #controls{
+  opacity:1;pointer-events:all;
 }
 
-@keyframes spin{
-to{
-transform:rotate(360deg)
+/* ── PROGRESS BAR ── */
+.prog-wrap{
+  position:relative;height:22px;display:flex;align-items:center;
+  cursor:pointer;margin-bottom:2px;user-select:none;
 }
+.prog-track{
+  width:100%;height:3px;border-radius:4px;
+  background:rgba(255,255,255,.18);
+  position:relative;overflow:visible;
+  transition:height .15s;
 }
+.prog-wrap:hover .prog-track{height:5px;}
 
-/* custom controls */
-
-.controls{
-position:absolute;
-left:0;
-right:0;
-bottom:0;
-padding:0 18px 14px;
-z-index:50;
-opacity:0;
-transition:.25s;
+.prog-buf{
+  position:absolute;top:0;left:0;height:100%;
+  background:rgba(255,255,255,.28);border-radius:4px;
+  pointer-events:none;
 }
-
-.player:hover .controls,
-.player.show-controls .controls{
-opacity:1;
+.prog-played{
+  position:absolute;top:0;left:0;height:100%;
+  background:linear-gradient(90deg,var(--blue),var(--purple));
+  border-radius:4px;pointer-events:none;
 }
-
-/* transparent fade only */
-.controls::before{
-content:'';
-position:absolute;
-left:0;
-right:0;
-bottom:0;
-height:110px;
-background:linear-gradient(to top,rgba(0,0,0,.58),transparent);
-pointer-events:none;
-z-index:-1;
+.prog-thumb{
+  position:absolute;top:50%;
+  width:13px;height:13px;border-radius:50%;
+  background:#fff;
+  transform:translate(-50%,-50%) scale(0);
+  transition:transform .15s;pointer-events:none;
+  box-shadow:0 0 6px rgba(0,0,0,.5);
 }
+.prog-wrap:hover .prog-thumb{transform:translate(-50%,-50%) scale(1);}
 
-/* live dvr bar */
-
-.timeline-wrap{
-margin-bottom:12px;
+.live-bar-tag{
+  position:absolute;right:0;top:50%;transform:translateY(-50%);
+  background:var(--red);padding:2px 9px;border-radius:20px;
+  font-size:9px;font-weight:800;letter-spacing:.5px;white-space:nowrap;
 }
 
-.live-row{
-display:flex;
-align-items:center;
-gap:10px;
-margin-bottom:8px;
-font-size:11px;
-font-weight:700;
+/* ── BOTTOM ROW ── */
+.ctrl-row{
+  display:flex;align-items:center;gap:2px;
+}
+.cl{display:flex;align-items:center;gap:1px;flex:1;min-width:0;}
+.cr{display:flex;align-items:center;gap:1px;}
+
+/* ── ICON BUTTON (Hotstar style) ── */
+.cbtn{
+  background:none;border:none;cursor:pointer;color:#fff;
+  width:40px;height:40px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s,transform .1s;
+  flex-shrink:0;opacity:.9;
+}
+.cbtn:hover{background:rgba(255,255,255,.14);opacity:1;}
+.cbtn:active{transform:scale(.88);}
+.cbtn svg{display:block;pointer-events:none;}
+
+/* ── VOLUME ── */
+.vol-group{
+  display:flex;align-items:center;gap:0;
+  overflow:hidden;max-width:40px;
+  transition:max-width .28s ease;
+}
+.vol-group:hover,.vol-group:focus-within{max-width:120px;}
+
+.vol-range{
+  -webkit-appearance:none;appearance:none;
+  width:76px;height:3px;border-radius:4px;
+  background:rgba(255,255,255,.22);outline:none;cursor:pointer;
+  flex-shrink:0;margin-left:4px;
+}
+.vol-range::-webkit-slider-thumb{
+  -webkit-appearance:none;width:13px;height:13px;border-radius:50%;
+  background:#fff;box-shadow:0 0 4px rgba(0,0,0,.5);cursor:pointer;
 }
 
-.dot{
-width:8px;
-height:8px;
-border-radius:50%;
-background:red;
-animation:pulse 1.2s infinite;
+/* ── TIME ── */
+.ctrl-time{
+  font-size:11px;font-weight:800;
+  color:rgba(255,255,255,.82);
+  white-space:nowrap;padding:0 6px;letter-spacing:.6px;
 }
 
-@keyframes pulse{
-50%{
-transform:scale(1.4);
-opacity:.45;
+/* ── LIVE CHIP ── */
+#liveChip{
+  display:flex;align-items:center;gap:5px;
+  padding:4px 10px;
+  background:rgba(10,8,25,.85);
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:20px;font-size:10px;font-weight:800;letter-spacing:.5px;
 }
+#liveDot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--red);box-shadow:0 0 6px var(--red);
+  animation:blink 1.3s infinite;
 }
-
-#goLive{
-border:0;
-background:#e50914;
-color:#fff;
-padding:4px 10px;
-font-size:10px;
-font-weight:800;
-border-radius:16px;
-display:none;
-cursor:pointer;
-}
-
-.timeline{
-height:5px;
-background:rgba(255,255,255,.22);
-border-radius:20px;
-overflow:hidden;
-position:relative;
-cursor:pointer;
+#liveChip.behind #liveDot{background:#666;box-shadow:none;animation:none;}
+#goLiveBtn{
+  display:none;border:0;
+  background:linear-gradient(90deg,var(--blue),var(--purple));
+  color:#fff;padding:2px 10px;font-size:9px;font-weight:800;
+  border-radius:12px;cursor:pointer;font-family:'Nunito',sans-serif;
 }
 
-.buffer{
-position:absolute;
-height:100%;
-background:rgba(255,255,255,.28);
-width:0%;
+/* ═══════════════════════════════════════
+   ERROR BOX
+═══════════════════════════════════════ */
+#errorBox{
+  display:none;inset:0;
+  background:rgba(10,8,25,.96);
+  z-index:999;justify-content:center;
+  align-items:center;flex-direction:column;gap:18px;
+}
+#errorBox h2{font-size:22px;font-weight:900;}
+#errorBox p{color:var(--muted);font-size:13px;}
+.retry-btn{
+  background:linear-gradient(90deg,var(--blue),var(--purple));
+  border:0;padding:12px 32px;color:#fff;font-weight:800;
+  border-radius:10px;cursor:pointer;font-size:14px;
+  font-family:'Nunito',sans-serif;transition:.2s;
+}
+.retry-btn:hover{opacity:.82;}
+
+/* ═══════════════════════════════════════
+   INFO BAR
+═══════════════════════════════════════ */
+.info-bar{
+  display:flex;align-items:center;gap:14px;
+  padding:13px 18px;
+  background:rgba(0,0,0,.22);
+  border-bottom:1px solid var(--border);
+}
+.info-logo{
+  width:48px;height:48px;border-radius:10px;
+  background:rgba(255,255,255,.05);
+  object-fit:contain;border:1px solid var(--border);
+  padding:4px;flex-shrink:0;
+}
+.ch-name{
+  font-family:'Bebas Neue';font-size:22px;
+  letter-spacing:1px;line-height:1;
+}
+.ch-sub{
+  margin-top:4px;font-size:11px;color:var(--muted);
+  font-weight:700;display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+}
+.tag{
+  background:linear-gradient(90deg,rgba(25,103,210,.25),rgba(123,47,247,.25));
+  border:1px solid rgba(123,47,247,.3);
+  padding:2px 8px;border-radius:4px;font-size:10px;font-weight:800;
 }
 
-.played{
-position:absolute;
-height:100%;
-background:#1e88ff;
-width:100%;
-right:0;
+/* ═══════════════════════════════════════
+   CHANNEL GRID
+═══════════════════════════════════════ */
+.related{max-width:1280px;margin:auto;padding:20px 18px 30px;}
+.sec-title{
+  font-family:'Bebas Neue';font-size:22px;letter-spacing:1.5px;
+  margin-bottom:14px;display:flex;align-items:center;gap:10px;
 }
-
-/* bottom buttons */
-
-.control-row{
-display:flex;
-align-items:center;
-justify-content:space-between;
+.sec-title::after{
+  content:'';flex:1;height:1px;
+  background:linear-gradient(90deg,rgba(123,47,247,.4),transparent);
 }
-
-.left,
-.right{
-display:flex;
-align-items:center;
-gap:14px;
-}
-
-.ctrl{
-width:34px;
-height:34px;
-border:0;
-background:none;
-cursor:pointer;
-display:flex;
-align-items:center;
-justify-content:center;
-}
-
-.ctrl svg{
-fill:#fff;
-width:22px;
-height:22px;
-}
-
-/* volume */
-.volbox{
-display:flex;
-align-items:center;
-gap:8px;
-}
-
-#volume{
-width:70px;
-accent-color:#1e88ff;
-}
-
-/* channel info */
-
-.info{
-padding:16px;
-display:flex;
-align-items:center;
-gap:14px;
-border-bottom:1px solid rgba(255,255,255,.07);
-}
-
-.info img{
-width:54px;
-height:54px;
-object-fit:contain;
-border-radius:10px;
-background:#111;
-}
-
-.name{
-font-size:20px;
-font-weight:800;
-}
-
-/* cards */
-
 .grid{
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
-gap:10px;
-padding:18px;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:10px;
 }
-
 .card{
-background:#101010;
-border:1px solid rgba(255,255,255,.08);
-border-radius:10px;
-overflow:hidden;
-text-decoration:none;
-color:#fff;
+  text-decoration:none;color:#fff;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;overflow:hidden;transition:.25s;
+}
+.card:hover{
+  transform:translateY(-3px) scale(1.02);
+  border-color:rgba(123,47,247,.5);
+  box-shadow:0 8px 24px rgba(123,47,247,.2);
+}
+.card.active{
+  border-color:var(--blue);
+  box-shadow:0 0 0 1px var(--blue),0 8px 20px rgba(25,103,210,.3);
+}
+.card-logo{
+  height:76px;display:flex;justify-content:center;align-items:center;
+  padding:10px;background:rgba(255,255,255,.03);
+}
+.card-logo img{width:100%;height:100%;object-fit:contain;}
+.card-name{
+  padding:8px 10px;text-align:center;
+  font-size:10px;font-weight:800;color:var(--muted);
+}
+.card.active .card-name{color:#fff;}
+
+footer{
+  text-align:center;padding:22px;
+  font-size:11px;color:var(--muted);
+  border-top:1px solid var(--border);
 }
 
-.card img{
-width:100%;
-height:70px;
-object-fit:contain;
-padding:8px;
-background:#171717;
-}
-
-.card div{
-padding:8px;
-font-size:11px;
-font-weight:700;
-text-align:center;
-}
-
-@media(max-width:700px){
-#volume{
-width:55px;
-}
-.control-row{
-gap:8px;
-}
+/* ═══════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════ */
+@media(max-width:640px){
+  header{height:48px;padding:0 12px;}
+  .logo{font-size:21px;}
+  main{padding-top:48px;}
+  .cbtn{width:34px;height:34px;}
+  .cbtn svg{width:17px;height:17px;}
+  .ctrl-time{font-size:10px;padding:0 3px;}
+  .info-bar{padding:10px 12px;gap:10px;}
+  .info-logo{width:40px;height:40px;}
+  .ch-name{font-size:18px;}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:8px;}
+  .card-logo{height:58px;}
+  .related{padding:14px 12px 24px;}
+  #watermark{bottom:70px;width:32px;}
+  #controls{padding:0 10px 8px;}
 }
 </style>
 </head>
 <body>
 
+<!-- ══════════ HEADER ══════════ -->
 <header>
-<div class="logo">NY CRICKET</div>
-<div class="livepill">LIVE</div>
+  <div class="logo">NY CRICKET</div>
+  <div class="hdr-right">
+    <div class="live-badge"><div class="live-badge-dot"></div>LIVE</div>
+    <a href="index.html" class="back-btn">← Channels</a>
+  </div>
 </header>
 
 <main>
 
+<!-- ══════════ PLAYER ══════════ -->
 <div class="player-wrap">
-<div class="player" id="playerWrap">
+  <div class="player-box" id="playerBox">
 
-<video id="video" autoplay muted playsinline></video>
+    <video id="video" playsinline autoplay muted></video>
 
-<div id="loader">
-<div class="spin"></div>
-<div>Connecting Live…</div>
+    <!-- LOADING OVERLAY -->
+    <div id="overlay">
+      <div class="hs-spin">
+        <span></span><span></span><span></span>
+      </div>
+      <div class="load-logo">NY CRICKET LIVE</div>
+      <div class="load-sub">Connecting to stream…</div>
+    </div>
+
+    <!-- WATERMARK -->
+    <img id="watermark"
+      src="https://i.postimg.cc/J4m9Dz70/Gemini-Generated-Image-4zvnud4zvnud4zvn-Picsart-Background-Remover.png"
+      alt="">
+
+    <!-- ══ CUSTOM CONTROLS (NO OVERLAY) ══ -->
+    <div id="controls">
+
+      <!-- PROGRESS BAR -->
+      <div class="prog-wrap" id="progWrap">
+        <div class="prog-track">
+          <div class="prog-buf"  id="progBuf"></div>
+          <div class="prog-played" id="progPlayed"></div>
+          <div class="prog-thumb"  id="progThumb"></div>
+        </div>
+        <div class="live-bar-tag">● LIVE</div>
+      </div>
+
+      <!-- BOTTOM ROW -->
+      <div class="ctrl-row">
+
+        <div class="cl">
+
+          <!-- PLAY/PAUSE -->
+          <button class="cbtn" id="btnPlay" title="Play / Pause">
+            <!-- PLAY icon (shown when paused) -->
+            <svg id="iPlay" width="22" height="22" viewBox="0 0 24 24" fill="#fff" style="display:none">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+            <!-- PAUSE icon -->
+            <svg id="iPause" width="22" height="22" viewBox="0 0 24 24" fill="#fff">
+              <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+            </svg>
+          </button>
+
+          <!-- REWIND 10s -->
+          <button class="cbtn" id="btnRew" title="Rewind 10s">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M12.5 4C8.36 4 4.96 7.13 4.5 11.2L3.07 9.77 2 10.84l3 3 3-3-1.07-1.07-1.3 1.3C5.96 7.69 8.94 5 12.5 5c3.58 0 6.5 2.92 6.5 6.5S16.08 18 12.5 18c-2.45 0-4.56-1.36-5.67-3.36l-.9.52C7.18 17.46 9.67 19 12.5 19c4.14 0 7.5-3.36 7.5-7.5S16.64 4 12.5 4z" fill="#fff"/>
+              <text x="12" y="14" font-size="6" fill="#fff" font-family="Nunito,Arial" font-weight="900" text-anchor="middle">10</text>
+            </svg>
+          </button>
+
+          <!-- FORWARD 10s -->
+          <button class="cbtn" id="btnFwd" title="Forward 10s">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M11.5 4c4.14 0 7.54 3.13 8 7.2L20.93 9.77 22 10.84l-3 3-3-3 1.07-1.07 1.3 1.3C18.04 7.69 15.06 5 11.5 5 7.92 5 5 7.92 5 11.5S7.92 18 11.5 18c2.45 0 4.56-1.36 5.67-3.36l.9.52C16.82 17.46 14.33 19 11.5 19 7.36 19 4 15.64 4 11.5S7.36 4 11.5 4z" fill="#fff"/>
+              <text x="12" y="14" font-size="6" fill="#fff" font-family="Nunito,Arial" font-weight="900" text-anchor="middle">10</text>
+            </svg>
+          </button>
+
+          <!-- VOLUME -->
+          <div class="vol-group">
+            <button class="cbtn" id="btnMute" title="Mute / Unmute">
+              <!-- VOL ON -->
+              <svg id="iVolOn" width="21" height="21" viewBox="0 0 24 24" fill="#fff">
+                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+              </svg>
+              <!-- VOL OFF -->
+              <svg id="iVolOff" width="21" height="21" viewBox="0 0 24 24" fill="#fff" style="display:none">
+                <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3 3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4 9.91 6.09 12 8.18V4z"/>
+              </svg>
+            </button>
+            <input type="range" class="vol-range" id="volRange" min="0" max="1" step="0.02" value="1">
+          </div>
+
+          <!-- TIME DISPLAY -->
+          <span class="ctrl-time" id="ctrlTime">LIVE</span>
+
+        </div><!-- /.cl -->
+
+        <div class="cr">
+
+          <!-- LIVE CHIP -->
+          <div id="liveChip">
+            <div id="liveDot"></div>
+            <span>LIVE</span>
+            <button id="goLiveBtn">Go Live</button>
+          </div>
+
+          <!-- SETTINGS -->
+          <button class="cbtn" id="btnSettings" title="Settings">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff">
+              <path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94L14.4 2.81A.49.49 0 0 0 13.92 2.4h-3.84c-.24 0-.43.17-.47.41L9.25 5.35c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.11.21-.07.47.12.61l2.03 1.58c-.05.3-.07.63-.07.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+            </svg>
+          </button>
+
+          <!-- FULLSCREEN -->
+          <button class="cbtn" id="btnFS" title="Fullscreen">
+            <svg id="iFS" width="20" height="20" viewBox="0 0 24 24" fill="#fff">
+              <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+            </svg>
+            <svg id="iFSExit" width="20" height="20" viewBox="0 0 24 24" fill="#fff" style="display:none">
+              <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
+            </svg>
+          </button>
+
+        </div><!-- /.cr -->
+      </div><!-- /.ctrl-row -->
+    </div><!-- /#controls -->
+
+    <!-- ERROR -->
+    <div id="errorBox">
+      <h2>⚠ Stream Unavailable</h2>
+      <p>Could not connect to the live stream.</p>
+      <button class="retry-btn" onclick="loadStream()">Retry</button>
+    </div>
+
+  </div><!-- /.player-box -->
+</div><!-- /.player-wrap -->
+
+<!-- ══════════ INFO BAR ══════════ -->
+<div class="info-bar">
+  <img id="logo" class="info-logo" src="" alt="">
+  <div>
+    <div id="channelName" class="ch-name">Loading…</div>
+    <div class="ch-sub">
+      <span class="tag">HD</span>
+      <span class="tag">LIVE</span>
+      <span class="tag">DVR</span>
+      <span>Live Stream</span>
+    </div>
+  </div>
 </div>
 
-<img class="wm"
-src="https://i.postimg.cc/J4m9Dz70/Gemini-Generated-Image-4zvnud4zvnud4zvn-Picsart-Background-Remover.png">
-
-<!-- CUSTOM HOTSTAR CONTROLS -->
-<div class="controls">
-
-<div class="timeline-wrap">
-
-<div class="live-row">
-<div class="dot"></div>
-LIVE
-<button id="goLive">GO LIVE</button>
+<!-- ══════════ CHANNEL GRID ══════════ -->
+<div class="related">
+  <div class="sec-title">More Channels</div>
+  <div id="grid" class="grid"></div>
 </div>
-
-<div class="timeline" id="timeline">
-<div class="buffer" id="buffer"></div>
-<div class="played" id="played"></div>
-</div>
-
-</div>
-
-<div class="control-row">
-
-<div class="left">
-
-<button class="ctrl" id="playBtn">
-<svg viewBox="0 0 24 24">
-<path d="M8 5v14l11-7z"/>
-</svg>
-</button>
-
-<div class="volbox">
-<button class="ctrl" id="muteBtn">
-<svg viewBox="0 0 24 24">
-<path d="M5 9v6h4l5 5V4L9 9z"/>
-</svg>
-</button>
-
-<input
-type="range"
-id="volume"
-min="0"
-max="1"
-step=".05"
-value="1">
-</div>
-
-</div>
-
-<div class="right">
-
-<button class="ctrl" id="fsBtn">
-<svg viewBox="0 0 24 24">
-<path d="M7 14H5v5h5v-2H7zm0-4h2V7h3V5H5v5zm10 7h-3v2h5v-5h-2zm0-12V5h-5v2h3v3h2z"/>
-</svg>
-</button>
-
-</div>
-
-</div>
-</div>
-</div>
-</div>
-
-<div class="info">
-<img id="logo">
-<div class="name" id="channelName">Loading...</div>
-</div>
-
-<div class="grid" id="grid"></div>
 
 </main>
+<footer>© 2026 NY Cricket Live &nbsp;·&nbsp; All rights reserved</footer>
 
+<!-- ══════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════ -->
 <script>
-const API="https://binge-jiotv.pages.dev/data/id.json";
+const API = "https://binge-jiotv.pages.dev/data/id.json";
+const vid  = document.getElementById("video");
+const pBox = document.getElementById("playerBox");
 
-const video=document.getElementById('video');
-const goLive=document.getElementById('goLive');
-const played=document.getElementById('played');
-const buffer=document.getElementById('buffer');
-const timeline=document.getElementById('timeline');
+let shakaPlayer, curCh, retries = 0;
+const chId = new URLSearchParams(location.search).get("id") || "";
 
-let player;
-let currentChannel;
+/* ── helpers ── */
+const $ = id => document.getElementById(id);
 
-const id=
-new URLSearchParams(location.search).get('id')||'';
+function hideOverlay(){ $("overlay").classList.add("hide"); }
+function showError(){   $("errorBox").style.display = "flex"; }
 
-async function getChannels(){
-const r=await fetch(API,{cache:"no-store"});
-const d=await r.json();
-return d.channels||d;
+/* ── channels ── */
+async function fetchChannels(){
+  const r = await fetch(API,{cache:"no-store"});
+  const d = await r.json();
+  return Array.isArray(d.channels) ? d.channels : d;
+}
+function renderChannels(list){
+  $("grid").innerHTML = list.map(c=>`
+    <a class="card ${c.id===chId?'active':''}" href="?id=${c.id}">
+      <div class="card-logo"><img src="${c.logo}" alt="${c.name}" loading="lazy"></div>
+      <div class="card-name">${c.name}</div>
+    </a>`).join('');
 }
 
-function renderCards(list){
-document.getElementById('grid').innerHTML=
-list.map(c=>`
-<a class="card" href="?id=${c.id}">
-<img src="${c.logo}">
-<div>${c.name}</div>
-</a>
-`).join('');
+/* ═════════════════════════════════════
+   CONTROLS
+═════════════════════════════════════ */
+
+/* PLAY/PAUSE */
+$("btnPlay").onclick = () => vid.paused ? vid.play() : vid.pause();
+vid.onplay  = () => { $("iPlay").style.display='none';  $("iPause").style.display='block'; };
+vid.onpause = () => { $("iPause").style.display='none'; $("iPlay").style.display='block';  };
+vid.onclick = () => vid.paused ? vid.play() : vid.pause();
+
+/* REWIND / FORWARD */
+$("btnRew").onclick = () => vid.currentTime = Math.max(0, vid.currentTime - 10);
+$("btnFwd").onclick = () => vid.currentTime += 10;
+
+/* MUTE / VOLUME */
+$("btnMute").onclick = () => {
+  vid.muted = !vid.muted;
+  syncVolUI();
+};
+$("volRange").oninput = function(){
+  vid.volume = +this.value;
+  vid.muted  = (+this.value === 0);
+  syncVolUI();
+};
+function syncVolUI(){
+  const muted = vid.muted || vid.volume === 0;
+  $("iVolOn").style.display  = muted ? 'none'  : 'block';
+  $("iVolOff").style.display = muted ? 'block' : 'none';
+  $("volRange").value = muted ? 0 : vid.volume;
 }
 
-async function init(ch){
+/* PROGRESS */
+function updateProgress(){
+  if(!shakaPlayer) return;
+  const r = shakaPlayer.seekRange();
+  if(!r||!r.end||r.end<=r.start) return;
+  const dur = r.end - r.start;
+  const pos = vid.currentTime - r.start;
+  const pct = Math.min(1,Math.max(0, pos/dur));
 
-currentChannel=ch;
+  $("progPlayed").style.width = (pct*100)+'%';
+  $("progThumb").style.left   = (pct*100)+'%';
 
-document.getElementById(
-'channelName'
-).innerText=ch.name;
+  /* buffered */
+  if(vid.buffered.length){
+    const bPct = Math.min(1,(vid.buffered.end(vid.buffered.length-1)-r.start)/dur);
+    $("progBuf").style.width = (bPct*100)+'%';
+  }
 
-document.getElementById(
-'logo'
-).src=ch.logo;
+  /* time label */
+  const lag = r.end - vid.currentTime;
+  $("ctrlTime").textContent = lag > 10
+    ? '-'+fmt(lag)
+    : 'LIVE';
 
-shaka.polyfill.installAll();
-
-player=new shaka.Player(video);
-
-if(ch.keyId&&ch.key){
-player.configure({
-drm:{
-clearKeys:{
-[ch.keyId]:ch.key
+  /* live chip */
+  const chip = $("liveChip");
+  const goBtn = $("goLiveBtn");
+  if(lag > 8){
+    chip.classList.add("behind");
+    goBtn.style.display = "inline-block";
+  } else {
+    chip.classList.remove("behind");
+    goBtn.style.display = "none";
+  }
 }
+setInterval(updateProgress, 500);
+
+function fmt(s){
+  s = Math.floor(s);
+  return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
 }
+
+/* SEEK */
+$("progWrap").addEventListener("click", e => {
+  if(!shakaPlayer) return;
+  const r = shakaPlayer.seekRange();
+  if(!r||!r.end) return;
+  const track = $("progWrap").querySelector('.prog-track');
+  const rect  = track.getBoundingClientRect();
+  const pct   = Math.min(1,Math.max(0,(e.clientX-rect.left)/rect.width));
+  shakaPlayer.seek(r.start + pct*(r.end-r.start));
 });
-}
 
-player.getNetworkingEngine()
-.registerRequestFilter(
-(type,req)=>{
+/* GO LIVE */
+$("goLiveBtn").onclick = () => {
+  const r = shakaPlayer && shakaPlayer.seekRange();
+  if(r && r.end) shakaPlayer.seek(r.end - 1);
+};
 
-req.headers.Referer=
-"https://www.jiotv.com/";
-
-if(ch.cookie){
-
-req.headers.Cookie=
-ch.cookie;
-
-let token=
-ch.cookie.replace(
-'__hdnea__=',
-''
-);
-
-if(
-(type===0||type===1)
-&&
-!req.uris[0].includes(
-'__hdnea__'
-)
-){
-let sep=
-req.uris[0].includes('?')
-?'&':'?';
-
-req.uris[0]+=
-sep+
-'__hdnea__='+
-token;
-}
-
-}
-
+/* FULLSCREEN */
+$("btnFS").onclick = () => {
+  document.fullscreenElement
+    ? document.exitFullscreen()
+    : pBox.requestFullscreen && pBox.requestFullscreen();
+};
+document.addEventListener("fullscreenchange", () => {
+  const fs = !!document.fullscreenElement;
+  $("iFS").style.display     = fs ? 'none'  : 'block';
+  $("iFSExit").style.display = fs ? 'block' : 'none';
 });
 
-await player.load(ch.url);
+/* AUTO-HIDE */
+let htimer;
+function showCtrl(){
+  pBox.classList.add("showctrl");
+  clearTimeout(htimer);
+  htimer = setTimeout(()=>{ if(!vid.paused) pBox.classList.remove("showctrl"); }, 3200);
+}
+pBox.addEventListener("mousemove", showCtrl);
+pBox.addEventListener("touchstart", ()=>{
+  pBox.classList.toggle("showctrl");
+  clearTimeout(htimer);
+  htimer = setTimeout(()=>pBox.classList.remove("showctrl"), 3500);
+},{passive:true});
 
-await video.play();
+/* ═════════════════════════════════════
+   SHAKA PLAYER INIT
+═════════════════════════════════════ */
+async function initPlayer(ch){
+  curCh = ch;
+  $("channelName").innerText = ch.name;
+  $("logo").src = ch.logo;
 
-document.getElementById(
-'loader'
-).style.display='none';
+  shaka.polyfill.installAll();
+  shakaPlayer = new shaka.Player(vid);
 
-startDVR();
+  if(ch.keyId && ch.key)
+    shakaPlayer.configure({ drm:{ clearKeys:{ [ch.keyId]:ch.key } } });
 
+  shakaPlayer.getNetworkingEngine().registerRequestFilter((type,req)=>{
+    req.headers.Referer = "https://www.jiotv.com/";
+    req.headers.Origin  = "https://www.jiotv.com";
+    if(ch.cookie){
+      req.headers.Cookie = ch.cookie;
+      const tok = ch.cookie.replace("__hdnea__=","");
+      if((type===0||type===1) && !req.uris[0].includes("__hdnea__")){
+        req.uris[0] += (req.uris[0].includes("?")?"&":"?")+"__hdnea__="+tok;
+      }
+    }
+  });
+
+  shakaPlayer.configure({
+    streaming:{ lowLatencyMode:true, bufferingGoal:15, rebufferingGoal:3, safeSeekOffset:5 },
+    manifest:{ defaultPresentationDelay:5 }
+  });
+
+  shakaPlayer.addEventListener("error", ()=>{
+    if(retries<4){ retries++; setTimeout(loadStream,2500); }
+    else showError();
+  });
+
+  await loadStream();
 }
 
-/* DVR edge logic */
-function startDVR(){
-
-setInterval(()=>{
-
-let r=
-player.seekRange();
-
-if(!r)return;
-
-let latency=
-r.end-video.currentTime;
-
-let total=
-r.end-r.start;
-
-let pos=
-(video.currentTime-r.start)
-/total*100;
-
-played.style.width=
-pos+'%';
-
-if(latency>10){
-goLive.style.display=
-'inline-block';
-}else{
-goLive.style.display='none';
+async function loadStream(){
+  try{
+    await shakaPlayer.load(curCh.url);
+    retries = 0;
+    vid.volume = 1; vid.muted = false;
+    $("volRange").value = 1;
+    syncVolUI();
+    await vid.play();
+    hideOverlay();
+    showCtrl();
+  }catch(e){
+    console.error(e);
+    showError();
+  }
 }
 
-if(video.buffered.length){
-let b=
-(video.buffered.end(0)-r.start)
-/
-total*100;
-buffer.style.width=b+'%';
-}
-
-},1000);
-
-}
-
-goLive.onclick=()=>{
-let r=player.seekRange();
-player.seek(r.end-1);
-};
-
-/* controls */
-document.getElementById(
-'playBtn'
-).onclick=()=>{
-
-if(video.paused){
-video.play();
-}else{
-video.pause();
-}
-
-};
-
-document.getElementById(
-'muteBtn'
-).onclick=()=>{
-video.muted=!video.muted;
-};
-
-document.getElementById(
-'volume'
-).oninput=e=>{
-video.volume=e.target.value;
-};
-
-document.getElementById(
-'fsBtn'
-).onclick=()=>{
-document.documentElement
-.requestFullscreen();
-};
-
-timeline.onclick=e=>{
-let r=player.seekRange();
-let pct=
-e.offsetX/
-timeline.offsetWidth;
-player.seek(
-r.start+
-((r.end-r.start)*pct)
-);
-};
-
-/* auto hide controls */
-let wrap=
-document.getElementById(
-'playerWrap'
-);
-
-let t;
-wrap.addEventListener(
-'mousemove',
-()=>{
-wrap.classList.add(
-'show-controls'
-);
-clearTimeout(t);
-t=setTimeout(()=>{
-wrap.classList.remove(
-'show-controls'
-);
-},3000);
-}
-);
-
-(async()=>{
-let channels=
-await getChannels();
-
-renderCards(channels);
-
-let ch=
-id
-?channels.find(
-x=>x.id===id
-)
-:channels[0];
-
-if(!ch) ch=channels[0];
-
-init(ch);
-
+/* ═════════════════════════════════════
+   BOOT
+═════════════════════════════════════ */
+(async ()=>{
+  try{
+    const list = await fetchChannels();
+    renderChannels(list);
+    let ch = chId ? list.find(x=>x.id===chId) : list[0];
+    if(!ch) ch = list[0];
+    initPlayer(ch);
+  }catch(e){ showError(); }
 })();
 </script>
-
 </body>
 </html>
