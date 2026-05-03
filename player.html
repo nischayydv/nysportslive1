@@ -624,7 +624,7 @@ function renderChannels(list){
 $("btnPlay").onclick = () => vid.paused ? vid.play() : vid.pause();
 vid.onplay  = () => { $("iPlay").style.display='none'; $("iPause").style.display='block'; };
 vid.onpause = () => { $("iPause").style.display='none'; $("iPlay").style.display='block'; };
-vid.onclick = () => vid.paused ? vid.play() : vid.pause();
+// Note: vid click handler is defined later in the touch section (desktop only)
 
 $("btnRew").onclick = () => { vid.currentTime = Math.max(0, vid.currentTime-10); flashSeek('left'); toast('⏪ -10s'); };
 $("btnFwd").onclick = () => { vid.currentTime += 10; flashSeek('right'); toast('⏩ +10s'); };
@@ -643,11 +643,21 @@ function goLive(){
   if(!shakaPlayer) return;
   const r = shakaPlayer.seekRange();
   if(r && r.end && r.end > r.start){
-    shakaPlayer.seek(r.end - 2);
-    toast('🔴 Jumped to Live');
+    // Use video.currentTime directly — most reliable method for HLS live streams
+    // Seek to 1s before live edge to avoid buffering stall at the very edge
+    vid.currentTime = r.end - 1;
+    // If video is paused (stalled), resume
+    if(vid.paused){ vid.play().catch(()=>{}); }
+    toast('🔴 Back to Live');
+    // Force progress bar to update immediately
+    $("progPlayed").style.width = '100%';
+    $("progThumb").style.left   = '100%';
+    $("liveChip").classList.remove("behind");
+    $("goLiveBtn").style.display = "none";
+    $("ctrlTime").textContent = 'LIVE';
   }
 }
-$("liveChip").onclick = () => { if($("liveChip").classList.contains("behind")) goLive(); };
+$("liveChip").onclick = (e) => { e.stopPropagation(); if($("liveChip").classList.contains("behind")) goLive(); };
 $("goLiveBtn").onclick = (e) => { e.stopPropagation(); goLive(); };
 
 /* ═══════════════ PROGRESS ═══════════════ */
@@ -746,32 +756,94 @@ let htimer;
 function showCtrl(){
   pBox.classList.add("showctrl");
   clearTimeout(htimer);
-  htimer = setTimeout(()=>{ if(!vid.paused) pBox.classList.remove("showctrl"); }, 3000);
+  htimer = setTimeout(()=>{ if(!vid.paused) pBox.classList.remove("showctrl"); }, 3500);
+}
+function hideCtrl(){
+  clearTimeout(htimer);
+  pBox.classList.remove("showctrl");
 }
 pBox.addEventListener("mousemove", showCtrl);
 
-/* Mobile: single tap = toggle controls, double tap = seek */
-let tapTimer=null, tapCount=0, tapX=0;
+/*
+ * MOBILE TAP HANDLING — fully rewritten to fix the "flash then hide" bug.
+ *
+ * Root cause of the bug:
+ *   - touchstart fires → we schedule a toggle timer
+ *   - the browser ALSO fires a synthetic 'click' event ~300ms later on the video
+ *   - that click triggers vid.onclick (play/pause) AND showCtrl() via bubbling
+ *   - result: controls toggle on in touchstart handler then immediately get
+ *     shown again by the click event, so they appear for only ~1 frame
+ *
+ * Fix:
+ *   1. Track touch position on touchstart (for movement detection)
+ *   2. Decide on touchend (not touchstart) whether it was a tap or a scroll
+ *   3. Call e.preventDefault() on touchend to cancel the synthetic click event
+ *   4. Never call showCtrl() from the video element's click handler on mobile
+ *   5. Double-tap (two taps < 300ms apart) = seek ±10s
+ *   6. Single tap on the video area = toggle controls visibility
+ */
+let touchStartX=0, touchStartY=0, touchMoved=false;
+let lastTapTime=0, lastTapX=0;
+
+// Track start position
 pBox.addEventListener("touchstart", e=>{
-  if(e.target.closest('#controls,#settingsPanel,.cbtn,#progWrap')) return;
-  tapCount++;
-  tapX = e.touches[0].clientX;
-  if(tapCount===1){
-    tapTimer = setTimeout(()=>{
-      tapCount=0;
-      pBox.classList.toggle("showctrl");
-      clearTimeout(htimer);
-      if(pBox.classList.contains("showctrl"))
-        htimer = setTimeout(()=>{ if(!vid.paused) pBox.classList.remove("showctrl"); }, 3200);
-    }, 220);
-  } else if(tapCount===2){
-    clearTimeout(tapTimer); tapCount=0;
-    const half = pBox.offsetWidth/2;
-    if(tapX < half){ vid.currentTime=Math.max(0,vid.currentTime-10); flashSeek('left'); toast('⏪ -10s'); }
-    else           { vid.currentTime+=10; flashSeek('right'); toast('⏩ +10s'); }
-    showCtrl();
-  }
+  if(e.target.closest('#controls,#settingsPanel,.cbtn,#progWrap,#liveChip')) return;
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+  touchMoved = false;
 },{passive:true});
+
+// Detect movement — if finger moves >10px it's a scroll, not a tap
+pBox.addEventListener("touchmove", e=>{
+  if(!touchStartX && !touchStartY) return;
+  const dx = Math.abs(e.touches[0].clientX - touchStartX);
+  const dy = Math.abs(e.touches[0].clientY - touchStartY);
+  if(dx > 10 || dy > 10) touchMoved = true;
+},{passive:true});
+
+// Act on touchend — prevents synthetic click from bubbling
+pBox.addEventListener("touchend", e=>{
+  if(e.target.closest('#controls,#settingsPanel,.cbtn,#progWrap,#liveChip')) return;
+  if(touchMoved){ touchMoved=false; return; } // was a scroll, ignore
+  touchMoved=false;
+
+  const now = Date.now();
+  const tapX = e.changedTouches[0].clientX;
+
+  // Double tap detection: two taps within 300ms and within 60px horizontally
+  if(now - lastTapTime < 300 && Math.abs(tapX - lastTapX) < 60){
+    // Double tap → seek
+    lastTapTime = 0; // reset so a 3rd tap doesn't re-trigger
+    const half = pBox.offsetWidth / 2;
+    if(tapX < half){ vid.currentTime = Math.max(0, vid.currentTime - 10); flashSeek('left'); toast('⏪ -10s'); }
+    else            { vid.currentTime += 10; flashSeek('right'); toast('⏩ +10s'); }
+    // Keep controls visible after seek
+    showCtrl();
+    e.preventDefault(); // cancel synthetic click
+    return;
+  }
+
+  // Single tap → toggle controls
+  lastTapTime = now;
+  lastTapX = tapX;
+
+  if(pBox.classList.contains("showctrl")){
+    hideCtrl(); // hide immediately on tap when already visible
+  } else {
+    showCtrl(); // show and start auto-hide timer
+  }
+
+  e.preventDefault(); // CRITICAL: cancel the synthetic click so vid.onclick doesn't fire
+},{passive:false}); // passive:false required to allow preventDefault()
+
+// Desktop click on video = play/pause (touch devices use the touchend handler above)
+vid.addEventListener("click", e=>{
+  // On touch devices the touchend handler already called preventDefault(),
+  // so this click event will NOT fire. This only runs on desktop.
+  if(matchMedia('(hover:hover)').matches){
+    vid.paused ? vid.play() : vid.pause();
+  }
+});
 
 /* ═══════════════ SETTINGS PANEL ═══════════════ */
 let settingsOpen = false;
