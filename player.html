@@ -9,13 +9,18 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{
-  --blue:#2979ff;--purple:#7c4dff;--pink:#e040fb;--red:#f44336;--cyan:#00e5ff;
+  --blue:#2979ff;--purple:#7c4dff;--pink:#e040fb;--red:#f44336;--cyan:#00e5ff;--green:#00e676;--amber:#ffab40;
   --bg:#080612;--bg2:#0f0a22;--bg3:#160e2e;
   --card:rgba(255,255,255,.05);--border:rgba(255,255,255,.08);--muted:rgba(255,255,255,.45);
   --ctrl-h:52px;
   --font:'Outfit',sans-serif;
 }
 html,body{width:100%;min-height:100%;background:var(--bg);color:#fff;font-family:var(--font);overflow-x:hidden;}
+
+/* ══════════════ SCROLLBAR ══════════════ */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(124,77,255,.4);border-radius:99px;}
 
 /* ══════════════ HEADER ══════════════ */
 header{
@@ -63,7 +68,7 @@ main{padding-top:52px;}
 .player-box > *{position:absolute;}
 video{
   inset:0;width:100%;height:100%;
-  object-fit:contain; /* FIXED: contain not cover on mobile */
+  object-fit:contain;
   background:#000;display:block;z-index:1;cursor:pointer;
 }
 
@@ -119,8 +124,7 @@ video{
   background:rgba(255,255,255,.2);position:relative;
   transition:height .15s ease;overflow:visible;
 }
-.prog-wrap:hover .prog-track,
-.prog-wrap:active .prog-track{height:5px;}
+.prog-wrap:hover .prog-track,.prog-wrap:active .prog-track{height:5px;}
 .prog-buf{position:absolute;top:0;left:0;height:100%;background:rgba(255,255,255,.3);border-radius:99px;pointer-events:none;transition:width .3s;}
 .prog-played{
   position:absolute;top:0;left:0;height:100%;border-radius:99px;pointer-events:none;
@@ -133,8 +137,7 @@ video{
   transition:transform .15s ease;pointer-events:none;
   box-shadow:0 0 8px rgba(124,77,255,.8),0 2px 6px rgba(0,0,0,.4);
 }
-.prog-wrap:hover .prog-thumb,
-.prog-wrap:active .prog-thumb{transform:translate(-50%,-50%) scale(1);}
+.prog-wrap:hover .prog-thumb,.prog-wrap:active .prog-thumb{transform:translate(-50%,-50%) scale(1);}
 .live-tag{
   position:absolute;right:0;top:50%;transform:translateY(-50%);
   background:var(--red);padding:2px 8px;border-radius:20px;
@@ -195,16 +198,9 @@ video{
 
 /* ══════════════ SETTINGS PANEL ══════════════ */
 #settingsPanel{
-  position:fixed; /* FIXED: fixed on mobile so it doesn't clip */
-  z-index:99999;
-  width:260px;
-  max-height:80vh;
-  overflow-y:auto;
-  background:rgba(12,8,28,.98);
-  border:1px solid rgba(124,77,255,.35);
-  border-radius:16px;
-  display:none;
-  backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);
+  position:fixed;z-index:99999;width:260px;max-height:80vh;overflow-y:auto;
+  background:rgba(12,8,28,.98);border:1px solid rgba(124,77,255,.35);border-radius:16px;
+  display:none;backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);
   box-shadow:0 20px 60px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.04),inset 0 1px 0 rgba(255,255,255,.06);
   animation:spIn .2s cubic-bezier(.34,1.56,.64,1);
   scrollbar-width:thin;scrollbar-color:rgba(124,77,255,.3) transparent;
@@ -214,10 +210,8 @@ video{
 @keyframes spIn{from{opacity:0;transform:translateY(12px) scale(.94);}to{opacity:1;transform:none;}}
 #settingsPanel.open{display:block;}
 .sp-header{
-  position:sticky;top:0;
-  padding:14px 16px 10px;
-  background:rgba(12,8,28,.98);
-  border-bottom:1px solid rgba(255,255,255,.06);
+  position:sticky;top:0;padding:14px 16px 10px;
+  background:rgba(12,8,28,.98);border-bottom:1px solid rgba(255,255,255,.06);
   font-size:11px;font-weight:800;letter-spacing:2px;color:var(--muted);text-transform:uppercase;
   display:flex;align-items:center;justify-content:space-between;z-index:2;
 }
@@ -236,20 +230,15 @@ video{
   font-size:13px;font-weight:600;color:rgba(255,255,255,.85);
 }
 .sp-row:hover{background:rgba(255,255,255,.05);}
-.sp-row .sp-val{
-  font-size:10px;font-weight:800;color:var(--purple);
-  background:rgba(124,77,255,.15);padding:2px 8px;border-radius:6px;
-}
+.sp-row .sp-val{font-size:10px;font-weight:800;color:var(--purple);background:rgba(124,77,255,.15);padding:2px 8px;border-radius:6px;}
 .sp-arrow{color:var(--muted);font-size:12px;transition:transform .2s ease;margin-left:6px;}
 .sp-row.expanded .sp-arrow{transform:rotate(180deg);}
 .sp-opts{display:none;background:rgba(0,0,0,.2);}
 .sp-opts.open{display:block;animation:fadeDown .18s ease;}
 @keyframes fadeDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 .sp-opt{
-  display:flex;align-items:center;gap:10px;
-  padding:9px 18px 9px 28px;
-  cursor:pointer;font-size:12px;font-weight:600;
-  color:rgba(255,255,255,.55);transition:all .12s;
+  display:flex;align-items:center;gap:10px;padding:9px 18px 9px 28px;
+  cursor:pointer;font-size:12px;font-weight:600;color:rgba(255,255,255,.55);transition:all .12s;
 }
 .sp-opt:hover{background:rgba(255,255,255,.04);color:#fff;}
 .sp-opt.active{color:#fff;}
@@ -312,26 +301,308 @@ video{
   font-size:9px;font-weight:800;letter-spacing:.5px;
 }
 
-/* ══════════════ CHANNELS GRID ══════════════ */
-.related{max-width:1280px;margin:auto;padding:18px 16px 32px;}
-.sec-title{
+/* ══════════════ SCORECARD ══════════════ */
+.scorecard-wrap{
+  max-width:1280px;margin:0 auto;
+  padding:20px 16px 32px;
+}
+
+.sc-header{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:16px;
+}
+.sc-title{
   font-family:'Bebas Neue';font-size:20px;letter-spacing:1.5px;
-  margin-bottom:12px;display:flex;align-items:center;gap:10px;
+  flex:1;
 }
-.sec-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(124,77,255,.4),transparent);}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;}
-.card{
-  text-decoration:none;color:#fff;
-  background:var(--card);border:1px solid var(--border);
-  border-radius:12px;overflow:hidden;
-  transition:all .25s cubic-bezier(.34,1.56,.64,1);cursor:pointer;
+.sc-title::after{content:'';display:inline-block;flex:1;height:1px;background:linear-gradient(90deg,rgba(124,77,255,.4),transparent);}
+.sc-live-badge{
+  display:flex;align-items:center;gap:6px;
+  background:linear-gradient(90deg,rgba(244,67,54,.15),rgba(244,67,54,.08));
+  border:1px solid rgba(244,67,54,.35);
+  padding:4px 12px;border-radius:20px;
+  font-size:10px;font-weight:800;letter-spacing:1px;color:#ff5252;white-space:nowrap;
 }
-.card:hover{transform:translateY(-3px) scale(1.02);border-color:rgba(124,77,255,.5);box-shadow:0 8px 24px rgba(124,77,255,.2);}
-.card.active{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue),0 6px 20px rgba(41,121,255,.3);}
-.card-logo{height:68px;display:flex;justify-content:center;align-items:center;padding:10px;background:rgba(255,255,255,.03);}
-.card-logo img{width:100%;height:100%;object-fit:contain;}
-.card-name{padding:6px 8px 8px;text-align:center;font-size:9px;font-weight:700;color:var(--muted);line-height:1.3;}
-.card.active .card-name{color:#fff;}
+.sc-live-badge .dot{width:6px;height:6px;border-radius:50%;background:#f44336;box-shadow:0 0 8px #f44336;animation:pulse 1.4s infinite;}
+
+/* MAIN SCORE CARD */
+.sc-main{
+  background:linear-gradient(135deg,rgba(15,10,34,.95),rgba(22,14,46,.9));
+  border:1px solid rgba(124,77,255,.2);
+  border-radius:20px;
+  overflow:hidden;
+  margin-bottom:12px;
+  position:relative;
+}
+.sc-main::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--blue),var(--purple),var(--pink));
+}
+.sc-match-meta{
+  padding:14px 18px 10px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+.sc-match-type{
+  font-size:9px;font-weight:900;letter-spacing:2px;
+  background:linear-gradient(90deg,var(--blue),var(--purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  text-transform:uppercase;
+}
+.sc-venue{font-size:10px;color:var(--muted);font-weight:600;}
+.sc-toss{font-size:10px;color:rgba(255,255,255,.4);font-weight:500;}
+
+.sc-score-section{
+  padding:18px 18px 14px;
+  display:grid;grid-template-columns:1fr auto;
+  align-items:center;gap:12px;
+}
+.sc-innings-score{
+  display:flex;flex-direction:column;gap:4px;
+}
+.sc-team-label{
+  font-size:10px;font-weight:900;letter-spacing:2px;color:var(--muted);text-transform:uppercase;
+}
+.sc-runs{
+  font-family:'Bebas Neue';font-size:44px;letter-spacing:2px;line-height:1;
+  background:linear-gradient(90deg,#fff,rgba(255,255,255,.7));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  transition:all .4s ease;
+}
+.sc-runs.updated{
+  animation:scoreFlash .5s ease;
+}
+@keyframes scoreFlash{
+  0%{-webkit-text-fill-color:transparent;}
+  30%{-webkit-text-fill-color:#00e676;}
+  100%{-webkit-text-fill-color:transparent;}
+}
+.sc-wkt-ov{
+  font-size:12px;font-weight:700;color:rgba(255,255,255,.55);
+  letter-spacing:.5px;
+}
+.sc-status-pill{
+  padding:6px 14px;border-radius:10px;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  font-size:10px;font-weight:700;color:rgba(255,255,255,.65);
+  text-align:right;line-height:1.5;
+  max-width:180px;
+}
+.sc-match-status{
+  padding:10px 18px 14px;
+  font-size:11px;font-weight:700;
+  color:rgba(255,200,0,.85);
+  letter-spacing:.3px;
+  display:flex;align-items:center;gap:8px;
+}
+.sc-match-status::before{
+  content:'';width:8px;height:8px;border-radius:50%;
+  background:rgba(255,200,0,.8);box-shadow:0 0 8px rgba(255,200,0,.6);flex-shrink:0;
+  animation:pulse 1.6s infinite;
+}
+
+/* CURRENT OVER BALLS */
+.sc-over-wrap{
+  padding:12px 18px;
+  border-top:1px solid rgba(255,255,255,.06);
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+.sc-over-label{
+  font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;
+  flex-shrink:0;
+}
+.sc-over-num{
+  font-size:10px;font-weight:700;color:rgba(255,255,255,.4);
+  flex-shrink:0;margin-right:4px;
+}
+.sc-balls{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.sc-ball{
+  width:30px;height:30px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:900;font-family:'Bebas Neue';letter-spacing:.5px;
+  border:1.5px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.06);
+  color:rgba(255,255,255,.6);
+  transition:all .3s cubic-bezier(.34,1.56,.64,1);
+  animation:ballPop .35s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes ballPop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.sc-ball.four{background:rgba(41,121,255,.2);border-color:rgba(41,121,255,.6);color:#64b5f6;}
+.sc-ball.six{background:rgba(124,77,255,.25);border-color:rgba(124,77,255,.7);color:#b39ddb;}
+.sc-ball.wicket{background:rgba(244,67,54,.2);border-color:rgba(244,67,54,.6);color:#ef9a9a;}
+.sc-ball.wide,.sc-ball.noball{background:rgba(255,171,64,.15);border-color:rgba(255,171,64,.5);color:#ffcc80;}
+.sc-ball.dot{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08);color:rgba(255,255,255,.3);}
+
+/* BATSMEN + BOWLER */
+.sc-players-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:10px;margin-bottom:10px;
+}
+@media(max-width:500px){
+  .sc-players-grid{grid-template-columns:1fr;}
+}
+
+.sc-panel{
+  background:linear-gradient(135deg,rgba(15,10,34,.95),rgba(22,14,46,.9));
+  border:1px solid rgba(124,77,255,.15);
+  border-radius:16px;overflow:hidden;
+}
+.sc-panel-hd{
+  padding:10px 14px 8px;
+  font-size:9px;font-weight:900;letter-spacing:2px;text-transform:uppercase;
+  color:var(--muted);border-bottom:1px solid rgba(255,255,255,.05);
+  display:flex;align-items:center;gap:6px;
+}
+.sc-panel-hd-dot{
+  width:6px;height:6px;border-radius:50%;flex-shrink:0;
+}
+.batsmen-hd .sc-panel-hd-dot{background:var(--blue);box-shadow:0 0 6px var(--blue);}
+.bowler-hd .sc-panel-hd-dot{background:var(--red);box-shadow:0 0 6px var(--red);}
+
+.sc-batter-row{
+  padding:9px 14px;
+  display:grid;grid-template-columns:1fr auto auto auto auto;
+  align-items:center;gap:6px;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  transition:background .2s;
+}
+.sc-batter-row:last-child{border-bottom:none;}
+.sc-batter-row.striker{background:rgba(41,121,255,.06);}
+.sc-batter-name{
+  font-size:12px;font-weight:700;color:#fff;
+  display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.sc-striker-icon{
+  width:6px;height:6px;border-radius:50%;background:var(--blue);box-shadow:0 0 6px var(--blue);flex-shrink:0;
+  animation:pulse 1.2s infinite;
+}
+.sc-stat{text-align:right;font-size:12px;}
+.sc-stat .num{font-weight:800;color:#fff;font-size:13px;}
+.sc-stat .lbl{font-size:8px;font-weight:700;color:var(--muted);letter-spacing:.8px;display:block;}
+.sc-stat .sr{font-size:10px;font-weight:600;color:rgba(255,255,255,.35);}
+
+.sc-col-hd{
+  padding:5px 14px;
+  display:grid;grid-template-columns:1fr auto auto auto auto;
+  gap:6px;
+  font-size:8px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.2);
+}
+
+.sc-bowler-row{
+  padding:10px 14px;
+  display:grid;grid-template-columns:1fr auto auto auto auto;
+  align-items:center;gap:6px;
+}
+.sc-bowler-name{font-size:12px;font-weight:700;color:#fff;}
+
+/* PARTNERSHIP + CRR */
+.sc-stats-row{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));
+  gap:10px;margin-bottom:10px;
+}
+.sc-stat-box{
+  background:linear-gradient(135deg,rgba(15,10,34,.95),rgba(22,14,46,.9));
+  border:1px solid rgba(124,77,255,.12);
+  border-radius:14px;padding:12px 14px;
+  text-align:center;
+}
+.sc-stat-box .val{
+  font-family:'Bebas Neue';font-size:28px;letter-spacing:1px;
+  background:linear-gradient(90deg,var(--blue),var(--purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  display:block;line-height:1;margin-bottom:4px;
+  transition:all .4s ease;
+}
+.sc-stat-box .val.updated{animation:statFlash .5s ease;}
+@keyframes statFlash{
+  0%{-webkit-text-fill-color:transparent;}
+  40%{-webkit-text-fill-color:var(--cyan);}
+  100%{-webkit-text-fill-color:transparent;}
+}
+.sc-stat-box .lbl{font-size:8px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);}
+
+/* LAST WICKET */
+.sc-last-wicket{
+  background:linear-gradient(135deg,rgba(244,67,54,.08),rgba(15,10,34,.95));
+  border:1px solid rgba(244,67,54,.2);
+  border-radius:14px;padding:12px 16px;
+  margin-bottom:10px;
+  display:flex;align-items:flex-start;gap:10px;
+}
+.sc-wkt-icon{
+  font-size:18px;flex-shrink:0;margin-top:1px;
+}
+.sc-wkt-label{font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:rgba(244,67,54,.7);margin-bottom:4px;}
+.sc-wkt-text{font-size:11px;font-weight:600;color:rgba(255,255,255,.6);line-height:1.5;}
+
+/* RECENT OVERS */
+.sc-recent{
+  background:linear-gradient(135deg,rgba(15,10,34,.95),rgba(22,14,46,.9));
+  border:1px solid rgba(124,77,255,.12);
+  border-radius:14px;padding:12px 16px;
+  margin-bottom:10px;
+}
+.sc-recent-hd{font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+.sc-recent-overs{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.sc-recent-chip{
+  font-size:11px;font-weight:700;
+  padding:4px 10px;border-radius:8px;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);
+  color:rgba(255,255,255,.5);letter-spacing:.5px;
+}
+
+/* REFRESH INDICATOR */
+.sc-footer-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 0 4px;
+  font-size:9px;font-weight:700;color:rgba(255,255,255,.2);letter-spacing:1px;
+}
+.sc-refresh{
+  display:flex;align-items:center;gap:5px;
+}
+.sc-refresh-dot{
+  width:5px;height:5px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 5px var(--green);animation:pulse 2s infinite;
+}
+
+/* LOADING SKELETON */
+.sc-skeleton{
+  border-radius:20px;overflow:hidden;
+  background:linear-gradient(135deg,rgba(15,10,34,.95),rgba(22,14,46,.9));
+  border:1px solid rgba(124,77,255,.12);
+  padding:24px 20px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:16px;min-height:180px;
+}
+.sc-skeleton-spinner{
+  width:40px;height:40px;border-radius:50%;
+  border:3px solid rgba(124,77,255,.15);
+  border-top-color:var(--purple);
+  animation:spin .8s linear infinite;
+}
+.sc-skeleton-text{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1px;}
+.sc-error-box{
+  border-radius:20px;overflow:hidden;
+  background:linear-gradient(135deg,rgba(244,67,54,.06),rgba(15,10,34,.95));
+  border:1px solid rgba(244,67,54,.2);
+  padding:24px 20px;text-align:center;
+}
+.sc-error-box p{font-size:12px;color:var(--muted);margin-bottom:12px;}
+.sc-retry-btn{
+  background:linear-gradient(90deg,var(--blue),var(--purple));border:0;
+  padding:8px 20px;color:#fff;font-weight:800;border-radius:8px;cursor:pointer;
+  font-size:11px;font-family:var(--font);
+}
+
+/* FADE-IN ANIMATION */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.sc-main,.sc-players-grid,.sc-stats-row,.sc-last-wicket,.sc-recent{
+  animation:fadeUp .4s ease both;
+}
+.sc-players-grid{animation-delay:.05s;}
+.sc-stats-row{animation-delay:.1s;}
+.sc-last-wicket{animation-delay:.15s;}
+.sc-recent{animation-delay:.2s;}
 
 footer{text-align:center;padding:20px;font-size:10px;color:var(--muted);border-top:1px solid var(--border);}
 
@@ -346,19 +617,26 @@ footer{text-align:center;padding:20px;font-size:10px;color:var(--muted);border-t
   #controls{padding:6px 10px 8px;}
   #watermark{bottom:62px;width:28px;}
   .player-box{padding-top:56.25%;}
-  .grid{grid-template-columns:repeat(auto-fill,minmax(95px,1fr));gap:6px;}
-  .card-logo{height:54px;}
-  .related{padding:12px 12px 24px;}
   #settingsPanel{width:calc(100vw - 24px);max-height:70vh;}
   .info-logo{width:38px;height:38px;}
   .ch-name{font-size:17px;}
+  .sc-runs{font-size:34px;}
+  .sc-stat-box .val{font-size:22px;}
+  .scorecard-wrap{padding:14px 12px 24px;}
+  .sc-batter-row,.sc-bowler-row,.sc-col-hd{
+    grid-template-columns:1fr auto auto auto;
+  }
+  .sc-batter-row .sc-stat:nth-child(5),
+  .sc-bowler-row .sc-stat:nth-child(5),
+  .sc-col-hd span:nth-child(5){display:none;}
+  .sc-ball{width:26px;height:26px;font-size:10px;}
+  .sc-score-section{gap:8px;}
+  .sc-status-pill{font-size:9px;max-width:130px;}
 }
 @media(max-width:360px){
   .cbtn{width:34px;height:34px;}
   .cbtn svg{width:16px;height:16px;}
 }
-
-/* PiP button glow when active */
 .cbtn.pip-active{background:rgba(41,121,255,.2);}
 </style>
 </head>
@@ -375,23 +653,17 @@ footer{text-align:center;padding:20px;font-size:10px;color:var(--muted);border-t
 <main>
 <div class="player-wrap">
   <div class="player-box" id="playerBox">
-
     <video id="video" playsinline autoplay muted></video>
-
-    <!-- GRADIENT FADE -->
     <div class="ctrl-fade"></div>
 
-    <!-- LOADING -->
     <div id="overlay">
       <div class="spinner"><i></i><i></i><i></i></div>
       <div class="load-logo">NY CRICKET LIVE</div>
       <div class="load-sub" id="loadSub">Connecting…</div>
     </div>
 
-    <!-- WATERMARK -->
     <img id="watermark" src="https://i.postimg.cc/J4m9Dz70/Gemini-Generated-Image-4zvnud4zvnud4zvn-Picsart-Background-Remover.png" alt="">
 
-    <!-- SEEK FLASH INDICATORS -->
     <div class="seek-flash" id="sfLeft">
       <svg viewBox="0 0 24 24" fill="#fff"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/></svg>
       <span>10s</span>
@@ -401,7 +673,6 @@ footer{text-align:center;padding:20px;font-size:10px;color:var(--muted);border-t
       <span>10s</span>
     </div>
 
-    <!-- CONTROLS -->
     <div id="controls">
       <div class="prog-wrap" id="progWrap">
         <div class="prog-track">
@@ -414,26 +685,22 @@ footer{text-align:center;padding:20px;font-size:10px;color:var(--muted);border-t
 
       <div class="ctrl-row">
         <div class="cl">
-          <!-- PLAY -->
           <button class="cbtn" id="btnPlay" title="Play/Pause">
             <svg id="iPlay" width="22" height="22" viewBox="0 0 24 24" fill="#fff" style="display:none"><path d="M8 5v14l11-7z"/></svg>
             <svg id="iPause" width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
           </button>
-          <!-- REWIND -->
           <button class="cbtn" id="btnRew" title="-10s">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff">
               <path d="M12.5 4C8.36 4 4.96 7.13 4.5 11.2L3.07 9.77 2 10.84l3 3 3-3-1.07-1.07-1.3 1.3C5.96 7.69 8.94 5 12.5 5c3.58 0 6.5 2.92 6.5 6.5S16.08 18 12.5 18c-2.45 0-4.56-1.36-5.67-3.36l-.9.52C7.18 17.46 9.67 19 12.5 19c4.14 0 7.5-3.36 7.5-7.5S16.64 4 12.5 4z"/>
               <text x="12" y="14.5" font-size="5.5" fill="#fff" font-family="Outfit,Arial" font-weight="900" text-anchor="middle">10</text>
             </svg>
           </button>
-          <!-- FORWARD -->
           <button class="cbtn" id="btnFwd" title="+10s">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff">
               <path d="M11.5 4c4.14 0 7.54 3.13 8 7.2L20.93 9.77 22 10.84l-3 3-3-3 1.07-1.07 1.3 1.3C18.04 7.69 15.06 5 11.5 5 7.92 5 5 7.92 5 11.5S7.92 18 11.5 18c2.45 0 4.56-1.36 5.67-3.36l.9.52C16.82 17.46 14.33 19 11.5 19 7.36 19 4 15.64 4 11.5S7.36 4 11.5 4z"/>
               <text x="12" y="14.5" font-size="5.5" fill="#fff" font-family="Outfit,Arial" font-weight="900" text-anchor="middle">10</text>
             </svg>
           </button>
-          <!-- VOLUME -->
           <div class="vol-group">
             <button class="cbtn" id="btnMute" title="Mute">
               <svg id="iVolOn" width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
@@ -445,24 +712,17 @@ footer{text-align:center;padding:20px;font-size:10px;color:var(--muted);border-t
         </div>
 
         <div class="cr">
-          <!-- LIVE CHIP -->
           <div id="liveChip" title="Go Live">
             <div id="liveDot"></div>
             <span>LIVE</span>
             <button id="goLiveBtn">Go Live</button>
           </div>
-
-          <!-- PiP BUTTON -->
           <button class="cbtn" id="btnPip" title="Mini Player" style="margin-left:2px">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M19 7h-8v6h8V7zm2-4H3c-1.1 0-2 .9-2 2v14c0 1.1.9 1.98 2 1.98h18c1.1 0 2-.88 2-1.98V5c0-1.1-.9-2-2-2zm0 16.01H3V4.98h18v14.03z"/></svg>
           </button>
-
-          <!-- SETTINGS -->
           <button class="cbtn" id="btnSettings" title="Settings">
             <svg width="19" height="19" viewBox="0 0 24 24" fill="#fff"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94L14.4 2.81A.49.49 0 0 0 13.92 2.4h-3.84c-.24 0-.43.17-.47.41L9.25 5.35c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.11.21-.07.47.12.61l2.03 1.58c-.05.3-.07.63-.07.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
           </button>
-
-          <!-- FULLSCREEN -->
           <button class="cbtn" id="btnFS" title="Fullscreen">
             <svg id="iFS" width="19" height="19" viewBox="0 0 24 24" fill="#fff"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
             <svg id="iFSExit" width="19" height="19" viewBox="0 0 24 24" fill="#fff" style="display:none"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
@@ -471,14 +731,11 @@ footer{text-align:center;padding:20px;font-size:10px;color:var(--muted);border-t
       </div>
     </div>
 
-    <!-- SETTINGS PANEL (outside ctrl div, fixed position) -->
     <div id="settingsPanel">
       <div class="sp-header">
         <span>⚙ Settings</span>
         <button class="sp-close" id="spClose">✕</button>
       </div>
-
-      <!-- SPEED -->
       <div class="sp-section">
         <div class="sp-label">Playback Speed</div>
         <div class="sp-row" id="rowSpeed">
@@ -497,8 +754,6 @@ footer{text-align:center;padding:20px;font-size:10px;color:var(--muted);border-t
           <div class="sp-opt" data-speed="2"><div class="dot-radio"></div>2×</div>
         </div>
       </div>
-
-      <!-- QUALITY -->
       <div class="sp-section">
         <div class="sp-label">Video Quality</div>
         <div class="sp-row" id="rowQuality">
@@ -512,8 +767,6 @@ footer{text-align:center;padding:20px;font-size:10px;color:var(--muted);border-t
           <div class="sp-opt active" data-quality="auto"><div class="dot-radio"></div>Auto</div>
         </div>
       </div>
-
-      <!-- AUDIO -->
       <div class="sp-section">
         <div class="sp-label">Audio Track</div>
         <div class="sp-row" id="rowAudio">
@@ -529,20 +782,16 @@ footer{text-align:center;padding:20px;font-size:10px;color:var(--muted);border-t
       </div>
     </div>
 
-    <!-- ERROR -->
     <div id="errorBox">
       <h2>⚠ Stream Unavailable</h2>
       <p id="errorMsg">Could not connect to the live stream.</p>
       <button class="retry-btn" id="retryBtn">↺ Retry</button>
     </div>
+  </div>
+</div>
 
-  </div><!-- /player-box -->
-</div><!-- /player-wrap -->
-
-<!-- TOAST -->
 <div id="toast"></div>
 
-<!-- INFO BAR -->
 <div class="info-bar">
   <img id="logo" class="info-logo" src="" alt="">
   <div>
@@ -556,17 +805,38 @@ footer{text-align:center;padding:20px;font-size:10px;color:var(--muted);border-t
   </div>
 </div>
 
-<!-- CHANNELS -->
-<div class="related">
-  <div class="sec-title">More Channels</div>
-  <div id="grid" class="grid"></div>
+<!-- ══════════════ LIVE SCORECARD ══════════════ -->
+<div class="scorecard-wrap">
+  <div class="sc-header">
+    <div class="sc-title" style="font-family:'Bebas Neue';font-size:20px;letter-spacing:1.5px;flex:1;">Live Scorecard</div>
+    <div class="sc-live-badge">
+      <div class="dot"></div>
+      UPDATING LIVE
+    </div>
+  </div>
+  <div id="scorecardContainer">
+    <div class="sc-skeleton">
+      <div class="sc-skeleton-spinner"></div>
+      <div class="sc-skeleton-text">FETCHING LIVE SCORE…</div>
+    </div>
+  </div>
+  <div class="sc-footer-bar" id="scFooter" style="display:none">
+    <span id="scMatchId"></span>
+    <div class="sc-refresh">
+      <div class="sc-refresh-dot"></div>
+      <span id="scLastUpdate">—</span>
+    </div>
+  </div>
 </div>
 </main>
 
 <footer>© 2026 NY Cricket Live · All rights reserved</footer>
 
 <script>
-const API = "https://raw.githubusercontent.com/nischayydv/jiojson1/main/stream.json";
+/* ════════════════════════════════════════════
+   VIDEO PLAYER LOGIC
+════════════════════════════════════════════ */
+const API_CHANNELS = "https://raw.githubusercontent.com/nischayydv/jiojson1/main/stream.json";
 const vid  = document.getElementById("video");
 const pBox = document.getElementById("playerBox");
 
@@ -574,7 +844,6 @@ let shakaPlayer = null, curCh = null, retries = 0, maxRetries = 5, isLoading = f
 const chId = new URLSearchParams(location.search).get("id") || "";
 const $ = id => document.getElementById(id);
 
-/* ═══════════════ TOAST ═══════════════ */
 let toastTimer;
 function toast(msg, dur=2000){
   const t = $("toast");
@@ -584,7 +853,6 @@ function toast(msg, dur=2000){
   toastTimer = setTimeout(()=>t.classList.remove("show"), dur);
 }
 
-/* ═══════════════ SEEK FLASH ═══════════════ */
 let sfTimers = {};
 function flashSeek(dir){
   const el = dir==='left' ? $("sfLeft") : $("sfRight");
@@ -593,38 +861,20 @@ function flashSeek(dir){
   sfTimers[dir] = setTimeout(()=>el.classList.remove("show"), 700);
 }
 
-/* ═══════════════ OVERLAY ═══════════════ */
 function showOverlay(msg){ $("overlay").classList.remove("hide"); $("loadSub").textContent = msg||"Connecting…"; }
 function hideOverlay(){ $("overlay").classList.add("hide"); }
 function showError(msg){ $("errorMsg").textContent = msg||"Could not connect."; $("errorBox").style.display="flex"; $("overlay").classList.add("hide"); }
 function hideError(){ $("errorBox").style.display="none"; }
 
-/* ═══════════════ CHANNELS ═══════════════ */
 async function fetchChannels(){
-  const r = await fetch(API, {cache:"no-store"});
+  const r = await fetch(API_CHANNELS, {cache:"no-store"});
   const d = await r.json();
   return Array.isArray(d.channels) ? d.channels : d;
 }
 
-function renderChannels(list){
-  $("grid").innerHTML = list.map(c=>`
-    <div class="card ${c.id===curCh?.id?'active':''}" data-id="${c.id}">
-      <div class="card-logo"><img src="${c.logo}" alt="${c.name}" loading="lazy"></div>
-      <div class="card-name">${c.name}</div>
-    </div>`).join('');
-  $("grid").onclick = e => {
-    const card = e.target.closest('.card');
-    if(!card) return;
-    const ch = allChannels.find(x=>x.id===card.dataset.id);
-    if(ch && ch.id!==curCh?.id) switchChannel(ch);
-  };
-}
-
-/* ═══════════════ PLAYBACK CONTROLS ═══════════════ */
 $("btnPlay").onclick = () => vid.paused ? vid.play() : vid.pause();
 vid.onplay  = () => { $("iPlay").style.display='none'; $("iPause").style.display='block'; };
 vid.onpause = () => { $("iPause").style.display='none'; $("iPlay").style.display='block'; };
-// Note: vid click handler is defined later in the touch section (desktop only)
 
 $("btnRew").onclick = () => { vid.currentTime = Math.max(0, vid.currentTime-10); flashSeek('left'); toast('⏪ -10s'); };
 $("btnFwd").onclick = () => { vid.currentTime += 10; flashSeek('right'); toast('⏩ +10s'); };
@@ -638,18 +888,13 @@ function syncVolUI(){
   $("volRange").value = m?0:vid.volume;
 }
 
-/* ═══════════════ LIVE CHIP + GO LIVE ═══════════════ */
 function goLive(){
   if(!shakaPlayer) return;
   const r = shakaPlayer.seekRange();
   if(r && r.end && r.end > r.start){
-    // Use video.currentTime directly — most reliable method for HLS live streams
-    // Seek to 1s before live edge to avoid buffering stall at the very edge
     vid.currentTime = r.end - 1;
-    // If video is paused (stalled), resume
     if(vid.paused){ vid.play().catch(()=>{}); }
     toast('🔴 Back to Live');
-    // Force progress bar to update immediately
     $("progPlayed").style.width = '100%';
     $("progThumb").style.left   = '100%';
     $("liveChip").classList.remove("behind");
@@ -660,7 +905,6 @@ function goLive(){
 $("liveChip").onclick = (e) => { e.stopPropagation(); if($("liveChip").classList.contains("behind")) goLive(); };
 $("goLiveBtn").onclick = (e) => { e.stopPropagation(); goLive(); };
 
-/* ═══════════════ PROGRESS ═══════════════ */
 function updateProgress(){
   if(!shakaPlayer) return;
   const r = shakaPlayer.seekRange();
@@ -683,7 +927,6 @@ function updateProgress(){
 setInterval(updateProgress, 500);
 function fmt(s){ s=Math.floor(s); return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
 
-/* SCRUB */
 let scrubbing = false;
 function scrubTo(e){
   if(!shakaPlayer) return;
@@ -702,15 +945,10 @@ document.addEventListener("touchmove", e=>{ if(scrubbing) scrubTo(e); },{passive
 document.addEventListener("mouseup",  ()=>scrubbing=false);
 document.addEventListener("touchend", ()=>scrubbing=false);
 
-/* ═══════════════ FULLSCREEN (FIXED FOR MOBILE) ═══════════════ */
 $("btnFS").onclick = toggleFS;
 function toggleFS(){
-  // Native video fullscreen for iOS
   if(vid.webkitEnterFullscreen && !document.fullscreenElement && !document.webkitFullscreenElement){
-    if(vid.webkitEnterFullscreen){
-      vid.webkitEnterFullscreen();
-      return;
-    }
+    if(vid.webkitEnterFullscreen){ vid.webkitEnterFullscreen(); return; }
   }
   if(document.fullscreenElement || document.webkitFullscreenElement){
     (document.exitFullscreen || document.webkitExitFullscreen).call(document);
@@ -728,12 +966,9 @@ function onFSChange(){
 }
 document.addEventListener("fullscreenchange", onFSChange);
 document.addEventListener("webkitfullscreenchange", onFSChange);
-
-/* iOS video fullscreen events */
 vid.addEventListener("webkitbeginfullscreen", ()=>{ $("iFS").style.display='none'; $("iFSExit").style.display='block'; });
 vid.addEventListener("webkitendfullscreen",   ()=>{ $("iFS").style.display='block'; $("iFSExit").style.display='none'; });
 
-/* ═══════════════ PICTURE-IN-PICTURE ═══════════════ */
 $("btnPip").onclick = async () => {
   try {
     if(document.pictureInPictureElement){
@@ -744,48 +979,23 @@ $("btnPip").onclick = async () => {
       await vid.requestPictureInPicture();
       $("btnPip").classList.add("pip-active");
       toast('📱 Mini Player Active');
-    } else {
-      toast('Mini Player not supported');
-    }
+    } else { toast('Mini Player not supported'); }
   } catch(e){ toast('Mini Player unavailable'); }
 };
 vid.addEventListener("leavepictureinpicture", ()=>$("btnPip").classList.remove("pip-active"));
 
-/* ═══════════════ AUTO-HIDE CONTROLS ═══════════════ */
 let htimer;
 function showCtrl(){
   pBox.classList.add("showctrl");
   clearTimeout(htimer);
   htimer = setTimeout(()=>{ if(!vid.paused) pBox.classList.remove("showctrl"); }, 3500);
 }
-function hideCtrl(){
-  clearTimeout(htimer);
-  pBox.classList.remove("showctrl");
-}
+function hideCtrl(){ clearTimeout(htimer); pBox.classList.remove("showctrl"); }
 pBox.addEventListener("mousemove", showCtrl);
 
-/*
- * MOBILE TAP HANDLING — fully rewritten to fix the "flash then hide" bug.
- *
- * Root cause of the bug:
- *   - touchstart fires → we schedule a toggle timer
- *   - the browser ALSO fires a synthetic 'click' event ~300ms later on the video
- *   - that click triggers vid.onclick (play/pause) AND showCtrl() via bubbling
- *   - result: controls toggle on in touchstart handler then immediately get
- *     shown again by the click event, so they appear for only ~1 frame
- *
- * Fix:
- *   1. Track touch position on touchstart (for movement detection)
- *   2. Decide on touchend (not touchstart) whether it was a tap or a scroll
- *   3. Call e.preventDefault() on touchend to cancel the synthetic click event
- *   4. Never call showCtrl() from the video element's click handler on mobile
- *   5. Double-tap (two taps < 300ms apart) = seek ±10s
- *   6. Single tap on the video area = toggle controls visibility
- */
 let touchStartX=0, touchStartY=0, touchMoved=false;
 let lastTapTime=0, lastTapX=0;
 
-// Track start position
 pBox.addEventListener("touchstart", e=>{
   if(e.target.closest('#controls,#settingsPanel,.cbtn,#progWrap,#liveChip')) return;
   touchStartX = e.touches[0].clientX;
@@ -793,7 +1003,6 @@ pBox.addEventListener("touchstart", e=>{
   touchMoved = false;
 },{passive:true});
 
-// Detect movement — if finger moves >10px it's a scroll, not a tap
 pBox.addEventListener("touchmove", e=>{
   if(!touchStartX && !touchStartY) return;
   const dx = Math.abs(e.touches[0].clientX - touchStartX);
@@ -801,74 +1010,49 @@ pBox.addEventListener("touchmove", e=>{
   if(dx > 10 || dy > 10) touchMoved = true;
 },{passive:true});
 
-// Act on touchend — prevents synthetic click from bubbling
 pBox.addEventListener("touchend", e=>{
   if(e.target.closest('#controls,#settingsPanel,.cbtn,#progWrap,#liveChip')) return;
-  if(touchMoved){ touchMoved=false; return; } // was a scroll, ignore
+  if(touchMoved){ touchMoved=false; return; }
   touchMoved=false;
-
   const now = Date.now();
   const tapX = e.changedTouches[0].clientX;
-
-  // Double tap detection: two taps within 300ms and within 60px horizontally
   if(now - lastTapTime < 300 && Math.abs(tapX - lastTapX) < 60){
-    // Double tap → seek
-    lastTapTime = 0; // reset so a 3rd tap doesn't re-trigger
+    lastTapTime = 0;
     const half = pBox.offsetWidth / 2;
     if(tapX < half){ vid.currentTime = Math.max(0, vid.currentTime - 10); flashSeek('left'); toast('⏪ -10s'); }
     else            { vid.currentTime += 10; flashSeek('right'); toast('⏩ +10s'); }
-    // Keep controls visible after seek
     showCtrl();
-    e.preventDefault(); // cancel synthetic click
+    e.preventDefault();
     return;
   }
-
-  // Single tap → toggle controls
   lastTapTime = now;
   lastTapX = tapX;
+  if(pBox.classList.contains("showctrl")){ hideCtrl(); }
+  else { showCtrl(); }
+  e.preventDefault();
+},{passive:false});
 
-  if(pBox.classList.contains("showctrl")){
-    hideCtrl(); // hide immediately on tap when already visible
-  } else {
-    showCtrl(); // show and start auto-hide timer
-  }
-
-  e.preventDefault(); // CRITICAL: cancel the synthetic click so vid.onclick doesn't fire
-},{passive:false}); // passive:false required to allow preventDefault()
-
-// Desktop click on video = play/pause (touch devices use the touchend handler above)
 vid.addEventListener("click", e=>{
-  // On touch devices the touchend handler already called preventDefault(),
-  // so this click event will NOT fire. This only runs on desktop.
-  if(matchMedia('(hover:hover)').matches){
-    vid.paused ? vid.play() : vid.pause();
-  }
+  if(matchMedia('(hover:hover)').matches){ vid.paused ? vid.play() : vid.pause(); }
 });
 
-/* ═══════════════ SETTINGS PANEL ═══════════════ */
 let settingsOpen = false;
-
 function positionSettings(){
   const panel = $("settingsPanel");
   const btn = $("btnSettings");
   const rect = btn.getBoundingClientRect();
   const pw = parseInt(getComputedStyle(panel).width);
   const isMobile = window.innerWidth <= 600;
-
   if(isMobile){
-    // center horizontally on mobile
     panel.style.left = Math.max(8, (window.innerWidth - pw) / 2) + 'px';
     panel.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
-    panel.style.top = 'auto';
-    panel.style.right = 'auto';
+    panel.style.top = 'auto'; panel.style.right = 'auto';
   } else {
-    // anchor to button
     let left = rect.right - pw;
     if(left < 8) left = 8;
     panel.style.left = left + 'px';
     panel.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
-    panel.style.top = 'auto';
-    panel.style.right = 'auto';
+    panel.style.top = 'auto'; panel.style.right = 'auto';
   }
 }
 
@@ -880,7 +1064,6 @@ $("btnSettings").onclick = (e) => {
   if(settingsOpen) pBox.classList.add("showctrl");
 };
 $("spClose").onclick = (e) => { e.stopPropagation(); settingsOpen=false; $("settingsPanel").classList.remove("open"); };
-
 document.addEventListener("click", e=>{
   if(settingsOpen && !$("settingsPanel").contains(e.target) && e.target!==$("btnSettings")){
     settingsOpen=false; $("settingsPanel").classList.remove("open");
@@ -963,7 +1146,6 @@ function populateAudio(){
   });
 }
 
-/* ═══════════════ SHAKA ═══════════════ */
 async function initShaka(){
   shaka.polyfill.installAll();
   if(!shaka.Player.isBrowserSupported()){ showError("Browser not supported."); return; }
@@ -986,7 +1168,6 @@ async function loadStream(){
     await shakaPlayer.unload();
     if(curCh.keyId&&curCh.key)
       shakaPlayer.configure({drm:{clearKeys:{[curCh.keyId]:curCh.key}}});
-
     shakaPlayer.getNetworkingEngine().clearAllRequestFilters();
     shakaPlayer.getNetworkingEngine().registerRequestFilter((type,req)=>{
       req.headers["Referer"]="https://www.jiotv.com/";
@@ -998,18 +1179,10 @@ async function loadStream(){
           req.uris[0]+=(req.uris[0].includes("?")?"&":"?")+"__hdnea__="+tok;
       }
     });
-
     shakaPlayer.configure({
-      streaming:{
-        lowLatencyMode:true,
-        bufferingGoal:15,
-        rebufferingGoal:3,
-        safeSeekOffset:5,
-        retryParameters:{maxAttempts:3,baseDelay:1000,backoffFactor:2}
-      },
+      streaming:{lowLatencyMode:true,bufferingGoal:15,rebufferingGoal:3,safeSeekOffset:5,retryParameters:{maxAttempts:3,baseDelay:1000,backoffFactor:2}},
       manifest:{defaultPresentationDelay:5}
     });
-
     await shakaPlayer.load(curCh.url);
     isLoading=false; retries=0;
     vid.volume=1; vid.muted=false; $("volRange").value=1; syncVolUI();
@@ -1026,19 +1199,245 @@ async function loadStream(){
   }
 }
 
-/* ═══════════════ SWITCH / RETRY ═══════════════ */
 function switchChannel(ch){
   curCh=ch; retries=0; isLoading=false;
   $("channelName").textContent=ch.name;
   $("logo").src=ch.logo;
-  document.querySelectorAll('.card').forEach(c=>c.classList.toggle("active",c.dataset.id===ch.id));
-  $("optsQuality").innerHTML=`<div class="sp-opt active" data-quality="auto"><div class="dot-radio"></div>Auto</div>`;
-  $("valQuality").textContent="Auto";
   loadStream();
 }
 $("retryBtn").onclick = ()=>{ retries=0; isLoading=false; loadStream(); };
 
-/* ═══════════════ BOOT ═══════════════ */
+/* ════════════════════════════════════════════
+   LIVE SCORECARD
+════════════════════════════════════════════ */
+const SCORE_API = "https://ny-cricket-api.vercel.app/match/153780/score";
+let prevScore = null;
+let scoreInterval = null;
+
+function getBallClass(ball) {
+  if(ball.is_wicket) return 'wicket';
+  if(ball.is_six) return 'six';
+  if(ball.is_four) return 'four';
+  if(ball.is_wide) return 'wide';
+  if(ball.is_no_ball) return 'noball';
+  if(ball.is_dot) return 'dot';
+  return '';
+}
+
+function getBallLabel(ball) {
+  if(ball.is_wicket) return 'W';
+  if(ball.is_wide) return 'Wd';
+  if(ball.is_no_ball) return 'Nb';
+  return ball.label || String(ball.runs);
+}
+
+function flashEl(id) {
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.classList.remove('updated');
+  void el.offsetWidth;
+  el.classList.add('updated');
+  setTimeout(()=>el.classList.remove('updated'), 600);
+}
+
+function timeAgo(ts) {
+  const diff = Math.round(Date.now()/1000 - ts);
+  if(diff < 5) return 'Just now';
+  if(diff < 60) return diff + 's ago';
+  return Math.floor(diff/60) + 'm ago';
+}
+
+function renderScorecard(d) {
+  const inn = d.innings && d.innings[0] ? d.innings[0] : null;
+  const runs = inn ? inn.runs : '—';
+  const wickets = inn ? inn.wickets : '—';
+  const overs = inn ? inn.overs : '—';
+
+  const batsmen = (d.current_batsmen||[]).slice(0,2);
+  const bowler = d.current_bowler || {};
+  const balls = d.current_over_balls || [];
+  const recents = d.recent_overs_summary || [];
+
+  // flash score if changed
+  const scoreStr = d.score||'';
+  if(prevScore && prevScore !== scoreStr) {
+    setTimeout(()=>{ flashEl('sc-runs-val'); flashEl('sc-crr-val'); flashEl('sc-pship-val'); }, 100);
+  }
+  prevScore = scoreStr;
+
+  const batsmenRows = batsmen.map(b => `
+    <div class="sc-batter-row ${b.is_striker?'striker':''}">
+      <div class="sc-batter-name">
+        ${b.is_striker ? '<div class="sc-striker-icon"></div>' : ''}
+        <span>${escHtml(b.name)}</span>
+      </div>
+      <div class="sc-stat"><span class="num">${b.runs}</span><span class="lbl">R</span></div>
+      <div class="sc-stat"><span class="num">${b.balls}</span><span class="lbl">B</span></div>
+      <div class="sc-stat"><span class="num">${b.fours}/${b.sixes}</span><span class="lbl">4s/6s</span></div>
+      <div class="sc-stat"><span class="sr">${b.strike_rate}</span><span class="lbl">SR</span></div>
+    </div>
+  `).join('');
+
+  const ballsHtml = balls.map(b => `
+    <div class="sc-ball ${getBallClass(b)}">${getBallLabel(b)}</div>
+  `).join('');
+
+  const recentHtml = recents.map(ov=>`<div class="sc-recent-chip">${escHtml(ov)}</div>`).join('');
+
+  const html = `
+    <div class="sc-main">
+      <div class="sc-match-meta">
+        <span class="sc-match-type">${escHtml(d.match_type||'')}</span>
+        <span class="sc-venue">📍 ${escHtml(d.venue||'')}</span>
+        <span class="sc-toss">🪙 ${escHtml(d.toss||'')}</span>
+      </div>
+
+      <div class="sc-score-section">
+        <div class="sc-innings-score">
+          <div class="sc-team-label">${inn ? escHtml(inn.team) : 'BATTING'}</div>
+          <div class="sc-runs" id="sc-runs-val">${runs}/${wickets}</div>
+          <div class="sc-wkt-ov">OVERS: ${overs}</div>
+        </div>
+        <div class="sc-status-pill">${escHtml(d.match_status||'')}</div>
+      </div>
+
+      <div class="sc-match-status">${escHtml(d.match_status||'')}</div>
+
+      <div class="sc-over-wrap">
+        <span class="sc-over-label">This Over</span>
+        <span class="sc-over-num">Ov ${escHtml(String(d.current_over_number||''))}</span>
+        <div class="sc-balls">${ballsHtml || '<span style="font-size:11px;color:var(--muted)">—</span>'}</div>
+      </div>
+    </div>
+
+    <div class="sc-players-grid">
+      <div class="sc-panel">
+        <div class="sc-panel-hd batsmen-hd">
+          <div class="sc-panel-hd-dot"></div>
+          Batsmen
+        </div>
+        <div class="sc-col-hd">
+          <span>Batter</span><span>R</span><span>B</span><span>4s/6s</span><span>SR</span>
+        </div>
+        ${batsmenRows || '<div style="padding:12px 14px;font-size:11px;color:var(--muted)">No data</div>'}
+      </div>
+
+      <div class="sc-panel">
+        <div class="sc-panel-hd bowler-hd">
+          <div class="sc-panel-hd-dot"></div>
+          Bowler
+        </div>
+        <div class="sc-col-hd">
+          <span>Bowler</span><span>O</span><span>M</span><span>R</span><span>W</span>
+        </div>
+        <div class="sc-bowler-row">
+          <div class="sc-bowler-name">${escHtml(bowler.name||'—')}</div>
+          <div class="sc-stat"><span class="num">${bowler.overs||'—'}</span><span class="lbl">O</span></div>
+          <div class="sc-stat"><span class="num">${bowler.maidens||'0'}</span><span class="lbl">M</span></div>
+          <div class="sc-stat"><span class="num">${bowler.runs||'—'}</span><span class="lbl">R</span></div>
+          <div class="sc-stat"><span class="num">${bowler.wickets||'0'}</span><span class="lbl">W</span></div>
+        </div>
+        ${bowler.economy ? `<div style="padding:4px 14px 10px;font-size:10px;color:var(--muted);font-weight:600;">Economy: <span style="color:rgba(255,255,255,.6)">${bowler.economy}</span></div>` : ''}
+      </div>
+    </div>
+
+    <div class="sc-stats-row">
+      <div class="sc-stat-box">
+        <span class="val" id="sc-crr-val">${escHtml(d.current_run_rate||'—')}</span>
+        <span class="lbl">Run Rate</span>
+      </div>
+      <div class="sc-stat-box">
+        <span class="val" id="sc-pship-val">${escHtml(d.partnership||'—')}</span>
+        <span class="lbl">Partnership</span>
+      </div>
+      ${d.required_run_rate && d.required_run_rate !== '0' ? `
+      <div class="sc-stat-box">
+        <span class="val">${escHtml(d.required_run_rate)}</span>
+        <span class="lbl">Req. Rate</span>
+      </div>` : ''}
+      ${d.target && d.target !== 'not found' ? `
+      <div class="sc-stat-box">
+        <span class="val">${escHtml(d.target)}</span>
+        <span class="lbl">Target</span>
+      </div>` : ''}
+    </div>
+
+    ${d.last_wicket ? `
+    <div class="sc-last-wicket">
+      <div class="sc-wkt-icon">🎯</div>
+      <div>
+        <div class="sc-wkt-label">Last Wicket</div>
+        <div class="sc-wkt-text">${escHtml(d.last_wicket)}</div>
+      </div>
+    </div>` : ''}
+
+    ${recents.length ? `
+    <div class="sc-recent">
+      <div class="sc-recent-hd">Recent Overs</div>
+      <div class="sc-recent-overs">${recentHtml}</div>
+    </div>` : ''}
+  `;
+
+  $('scorecardContainer').innerHTML = html;
+
+  const footer = $('scFooter');
+  footer.style.display = 'flex';
+  $('scMatchId').textContent = 'Match #' + escHtml(String(d.match_id||''));
+  updateFooterTime(d.fetched_at);
+}
+
+let lastFetchedAt = 0;
+function updateFooterTime(ts) {
+  if(ts) lastFetchedAt = ts;
+  const el = $('scLastUpdate');
+  if(el && lastFetchedAt) el.textContent = 'Updated ' + timeAgo(lastFetchedAt);
+}
+setInterval(()=>updateFooterTime(), 1000);
+
+function renderSkeleton() {
+  $('scorecardContainer').innerHTML = `
+    <div class="sc-skeleton">
+      <div class="sc-skeleton-spinner"></div>
+      <div class="sc-skeleton-text">FETCHING LIVE SCORE…</div>
+    </div>`;
+}
+
+function renderScoreError(msg) {
+  $('scorecardContainer').innerHTML = `
+    <div class="sc-error-box">
+      <p>${escHtml(msg||'Could not load score. Please try again.')}</p>
+      <button class="sc-retry-btn" onclick="fetchScore()">↺ Retry</button>
+    </div>`;
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function fetchScore() {
+  try {
+    const res = await fetch(SCORE_API, {cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
+    if(data.status === 'success') {
+      renderScorecard(data);
+    } else {
+      renderScoreError('Score data unavailable.');
+    }
+  } catch(e) {
+    console.warn('Score fetch error:', e);
+    if(!prevScore) renderScoreError('Could not connect to score server.');
+  }
+}
+
+function startScoreUpdates() {
+  fetchScore();
+  scoreInterval = setInterval(fetchScore, 8000);
+}
+
+/* ════════════════════════════════════════════
+   BOOT
+════════════════════════════════════════════ */
 (async()=>{
   try {
     await initShaka();
@@ -1048,9 +1447,9 @@ $("retryBtn").onclick = ()=>{ retries=0; isLoading=false; loadStream(); };
     curCh=ch;
     $("channelName").textContent=ch.name;
     $("logo").src=ch.logo;
-    renderChannels(allChannels);
     loadStream();
   } catch(e){ console.error("Boot error",e); showError("Failed to load channels."); }
+  startScoreUpdates();
 })();
 </script>
 </body>
