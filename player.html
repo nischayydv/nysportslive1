@@ -823,7 +823,7 @@ function playerImg(id){return squadImageMap[id]||'https://static.cricbuzz.com/a/
 function timeAgo(ts){const d=Math.round(Date.now()/1000-ts);if(d<5)return 'Just now';if(d<60)return d+'s ago';return Math.floor(d/60)+'m ago';}
 
 /* ════════════ LIVE SCORE ════════════ */
-const LS_API="https://ny-cricket-api.vercel.app/match/152097/score";
+const LS_API="https://ny-cricket-api.vercel.app/match/152108/score";
 let lsPrevBalls=[], lsLastFetchedAt=0, lsLoaded=false;
 
 function getBallClass(b){
@@ -1017,7 +1017,7 @@ async function fetchLiveScore(){
 }
 
 /* ════════════ SCORECARD ════════════ */
-const SC_API="https://ny-scorecard-api.vercel.app/scorecard?match_id=152097";
+const SC_API="https://ny-scorecard-api.vercel.app/scorecard?match_id=152108";
 let scLoaded=false, scData=null, scActiveInnings=0;
 
 async function fetchScorecard(){
@@ -1136,7 +1136,7 @@ function renderScInnings(innings,idx){
 }
 
 /* ════════════ SQUADS ════════════ */
-const SQ_API="https://ny-scorecard-api.vercel.app/squads?match_id=152097";
+const SQ_API="https://ny-scorecard-api.vercel.app/squads?match_id=152108";
 let sqLoaded=false, sqActiveTeam=0;
 
 async function fetchSquads(){
